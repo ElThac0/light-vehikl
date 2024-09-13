@@ -17,6 +17,9 @@ defineProps({
         type: String,
         required: true,
     },
+    sessionId: {
+        type: String,
+    }
 });
 
 function handleImageError() {
@@ -77,7 +80,7 @@ function handleImageError() {
                 </header>
 
                 <main class="mt-6">
-                    <Game />
+                    <Game :sessionId="sessionId"/>
                 </main>
 
                 <footer class="py-16 text-center text-sm text-black dark:text-white/70">

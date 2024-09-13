@@ -12,10 +12,11 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'sessionId' => session()->id(),
     ]);
 });
 
-Route::get('/game', [GameController::class, 'index'])->name('game.index');
+//Route::get('/game', [GameController::class, 'index'])->name('game.index');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
