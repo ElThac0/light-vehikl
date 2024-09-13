@@ -2,9 +2,10 @@
 import Tile from './Tile.vue'
 import {onMounted, ref, watch} from "vue";
 
-window.Echo.listen('game', 'move', () => {
-
-})
+window.Echo.channel('GameChannel')
+    .listen('.player.joined', (event) => {
+  console.log('player joined', event);
+});
 
 const arenaSize = 50;
 
@@ -16,11 +17,13 @@ const handleKeyPress = (e) => {
   switch (e.key) {
     case 's':
       player.value.x = player.value.x + 1;
+      // window.Echo.channel('GameChannel').('PlayerJoined', { hello: 'world'});
   }
 }
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyPress);
+
 });
 
 </script>
