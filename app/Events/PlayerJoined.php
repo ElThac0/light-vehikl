@@ -14,7 +14,7 @@ class PlayerJoined implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public string $player)
+    public function __construct(public array $players)
     {
 
     }
@@ -33,6 +33,6 @@ class PlayerJoined implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        return ['player' => $this->player];
+        return ['players' => $this->players];
     }
 }

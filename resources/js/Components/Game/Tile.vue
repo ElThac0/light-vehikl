@@ -3,13 +3,13 @@
 import {computed, reactive} from "vue";
 
 const props = defineProps({
-  player: {x: Number, y: Number},
+  players: {x: Number, y: Number},
   x: Number,
   y: Number,
 });
 
 const isPlayerHere = computed(() => {
-  return props.x === props.player?.x && props.y === props.player?.y;
+  return props.players.some(player => props.x === player.location.x && props.y === player.location.y);
 });
 
 </script>

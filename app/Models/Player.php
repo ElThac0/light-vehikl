@@ -11,7 +11,6 @@ class Player extends Model
 
     protected $fillable = [
         'playerId',
-        'x',
-        'y',
+        'location',
     ];
 }
