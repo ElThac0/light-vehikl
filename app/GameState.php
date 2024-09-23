@@ -9,6 +9,7 @@ class GameState
     const MAX_PLAYERS = 4;
     public array $arena;
     public array $players = [];
+    protected int $maxX, $maxY;
 
     public function __construct(protected int $arenaSize)
     {
@@ -17,6 +18,7 @@ class GameState
                 $this->arena[] = new Tile($x, $y);
             }
         }
+        $this->maxX = $this->maxY = $this->arenaSize - 1;
     }
 
     public function getTile(int $x, int $y): Tile
@@ -32,7 +34,12 @@ class GameState
 
     public function getStartLocations(): array
     {
-        return array_slice($this->arena, 0, 4);
+        return [
+            $this->getTile(0, 0),
+            $this->getTile(0, $this->maxY),
+            $this->getTile($this->maxX, 0),
+            $this->getTile($this->maxY, $this->maxY),
+        ];
     }
 
     public function getNextStartLocation(): Tile
