@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class Player extends Model
+class Player
 {
-    use HasFactory;
 
-    protected $fillable = [
-        'playerId',
-        'location',
-    ];
+    public function __construct(public ?int $x = null, public ?int $y = null)
+    {
+    }
+
+    public function getLocation(): array
+    {
+        return [$this->x, $this->y];
+    }
+
+    public function setLocation(array $coordinates): self
+    {
+        $this->x = $coordinates[0];
+        $this->y = $coordinates[1];
+
+        return $this;
+    }
+
 }
