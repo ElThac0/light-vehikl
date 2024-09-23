@@ -6,6 +6,7 @@ use App\Models\Player;
 
 class GameState
 {
+    const MAX_PLAYERS = 4;
     public array $arena;
     public array $players = [];
 
@@ -24,6 +25,21 @@ class GameState
         return $this->arena[$addr];
     }
 
+    public function getMaxPlayers(): int
+    {
+        return self::MAX_PLAYERS;
+    }
+
+    public function getStartLocations(): array
+    {
+        return array_slice($this->arena, 0, 4);
+    }
+
+    public function getNextStartLocation(): Tile
+    {
+        return $this->getStartLocations()[count($this->getPlayers())];
+    }
+
     public function getPlayers()
     {
         return $this->players;
@@ -31,8 +47,11 @@ class GameState
 
     public function addPlayer(Player $player): void
     {
-        $this->players[] = $player->setLocation([1, 1]);
+        $location = $this->getNextStartLocation();
+        $this->players[] = $player->setLocation($location->getCoords());
+        $location->setContents($player);
     }
+
     public function toArray(): array
     {
         return $this->arena;
