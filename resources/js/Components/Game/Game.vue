@@ -30,7 +30,8 @@ const handleKeyPress = (e) => {
 
 const handleStart = (e) => {
   e.preventDefault();
-  axios.get(route('player.joined', {id: props.sessionId}));
+  // axios.get(route('player.joined', {id: props.sessionId}));
+  axios.post(route('game.create'));
 }
 
 const playerInGame = computed(() => {

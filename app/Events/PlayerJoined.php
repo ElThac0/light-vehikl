@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Broadcasting\GameChannel;
+use App\GameState;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -14,7 +15,7 @@ class PlayerJoined implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public array $players)
+    public function __construct(public GameState $game)
     {
 
     }
@@ -33,6 +34,6 @@ class PlayerJoined implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        return ['players' => $this->players];
+        return ['players' => $this->game->getPlayers()];
     }
 }

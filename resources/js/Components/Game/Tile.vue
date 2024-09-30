@@ -9,7 +9,7 @@ const props = defineProps({
 });
 
 const isPlayerHere = computed(() => {
-  return props.players.some(player => props.x === player.location.x && props.y === player.location.y);
+  return props.players.some(player => props.x === player.x && props.y === player.y);
 });
 
 </script>

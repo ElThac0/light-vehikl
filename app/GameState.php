@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Models\Player;
+use Ramsey\Uuid\Uuid;
 
 class GameState
 {
@@ -10,6 +11,7 @@ class GameState
     public array $arena;
     public array $players = [];
     protected int $maxX, $maxY;
+    protected string $id;
 
     public function __construct(protected int $arenaSize)
     {
@@ -19,6 +21,7 @@ class GameState
             }
         }
         $this->maxX = $this->maxY = $this->arenaSize - 1;
+        $this->id = Uuid::uuid4();
     }
 
     public function getTile(int $x, int $y): Tile
@@ -47,9 +50,14 @@ class GameState
         return $this->getStartLocations()[count($this->getPlayers())];
     }
 
-    public function getPlayers()
+    public function getPlayers(): array
     {
         return $this->players;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     public function addPlayer(Player $player): void
