@@ -19,6 +19,9 @@ defineProps({
     },
     sessionId: {
         type: String,
+    },
+    gameList: {
+        type: Array,
     }
 });
 
@@ -80,6 +83,11 @@ function handleImageError() {
                 </header>
 
                 <main class="mt-6">
+                    <ol>
+                      <li v-for="game in gameList">
+                        {{ game }}
+                      </li>
+                    </ol>
                     <Game :sessionId="sessionId"/>
                 </main>
 

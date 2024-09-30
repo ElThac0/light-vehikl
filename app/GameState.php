@@ -65,10 +65,16 @@ class GameState
         $location = $this->getNextStartLocation();
         $this->players[] = $player->setLocation($location->getCoords());
         $location->setContents($player);
+
     }
 
     public function toArray(): array
     {
-        return $this->arena;
+        return [
+            'id' => $this->id,
+            'arenaSize' => $this->arenaSize,
+            'tiles' => $this->arena,
+            'players' => $this->players,
+        ];
     }
 }
