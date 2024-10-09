@@ -8,5 +8,5 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/player-joined/{id}', AddPlayer::class)->name('player.joined');
+//Route::get('/player-joined/{id}', AddPlayer::class)->name('player.joined');
 

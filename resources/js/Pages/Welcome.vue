@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import Game from '@/Components/Game/Game.vue'
+import GameList from "@/Components/Game/GameList.vue";
 
 defineProps({
     canLogin: {
@@ -83,12 +84,8 @@ function handleImageError() {
                 </header>
 
                 <main class="mt-6">
-                    <ol>
-                      <li v-for="game in gameList">
-                        {{ game }}
-                      </li>
-                    </ol>
-                    <Game :sessionId="sessionId"/>
+                  <GameList :gameList="gameList" />
+                  <Game :sessionId="sessionId"/>
                 </main>
 
                 <footer class="py-16 text-center text-sm text-black dark:text-white/70">

@@ -38,4 +38,6 @@ Route::middleware('auth')->group(function () {
 Route::post('/games', CreateGame::class)->name('game.create');
 Route::get('/my-game', GetGame::class)->name('game.my');
 
+Route::post('/player-joined/{id}', AddPlayer::class)->name('game.join');
+
 require __DIR__.'/auth.php';

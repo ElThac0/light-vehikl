@@ -21,7 +21,7 @@ class CreateGame extends Controller
         $gameState->addPlayer($player);
         $request->session()->put('active_game', $gameState->getId());
 
-        Cache::set("game_state.{$gameState->getId()}", $gameState);
+        $gameState->save();
         $gameList = Cache::remember("game_list", 3600, function () {
             return [];
         });

@@ -9,8 +9,9 @@ class Player
 {
     protected PlayerStatus $status = PlayerStatus::WAITING;
 
-    public function __construct(public ?int $x = null, public ?int $y = null)
+    public function __construct(public string $id)
     {
+
     }
 
     public function getLocation(): array

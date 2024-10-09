@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Models\Player;
+use Exception;
+use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
 
 class GameState
@@ -60,12 +62,29 @@ class GameState
         return $this->id;
     }
 
+    /**
+     * @throws Exception
+     */
     public function addPlayer(Player $player): void
     {
+        if (count($this->players) >= self::MAX_PLAYERS) {
+            throw new Exception('Max players reached');
+        }
+
         $location = $this->getNextStartLocation();
         $this->players[] = $player->setLocation($location->getCoords());
         $location->setContents($player);
+    }
 
+    public function save(): self
+    {
+        Cache::set("game_state.{$this->id}", $this);
+        return $this;
+    }
+
+    public static function find($id): ?GameState
+    {
+        return Cache::get("game_state.{$id}");
     }
 
     public function toArray(): array
