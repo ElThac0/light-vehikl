@@ -6,6 +6,10 @@ window.Echo.channel('GameChannel')
     .listen('.player.joined', (event) => {
       console.log('player joined', event);
       activeGame.value.players = event.players;
+    })
+    .listen('.game.updated', (event) => {
+      console.log('game updated', event);
+      activeGame.value.players = event.players;
     });
 
 const props = defineProps({

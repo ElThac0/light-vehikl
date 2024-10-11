@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Events\GameUpdated;
 use App\Models\Player;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -93,6 +94,7 @@ class GameState
         foreach($this->getPlayers() as $player) {
             $this->movePlayer($player);
         }
+        GameUpdated::dispatch($this);
     }
 
     protected function movePlayer(Player $player): void

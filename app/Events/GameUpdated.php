@@ -12,7 +12,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 
-class GameCreated implements ShouldBroadcast
+class GameUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -30,14 +30,11 @@ class GameCreated implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return 'game.created';
+        return 'game.updated';
     }
 
     public function broadcastWith(): array
     {
-        $gameList = Cache::remember('game_list', 3600, function () {
-            return [];
-        });
-        return ['games' => $gameList];
+        return ['players' => $this->game->getPlayers()];
     }
 }
