@@ -6,6 +6,7 @@ use App\Models\Player;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
+use App\Enums\Direction;
 
 class GameState
 {
@@ -72,7 +73,7 @@ class GameState
         }
 
         $location = $this->getNextStartLocation();
-        $this->players[] = $player->setLocation($location->getCoords());
+        $this->players[] = $player->setLocation($location->getCoords())->setDirection(Direction::SOUTH);
         $location->setContents($player);
     }
 
@@ -85,6 +86,23 @@ class GameState
     public static function find($id): ?GameState
     {
         return Cache::get("game_state.{$id}");
+    }
+
+    public function nextTick(): void
+    {
+        foreach($this->getPlayers() as $player) {
+            $this->movePlayer($player);
+        }
+    }
+
+    protected function movePlayer(Player $player): void
+    {
+        match ($player->direction) {
+          Direction::NORTH => $player->moveNorth(),
+          Direction::EAST => $player->moveEast(),
+          Direction::SOUTH => $player->moveSouth(),
+          Direction::WEST => $player->moveWest(),
+        };
     }
 
     public function toArray(): array

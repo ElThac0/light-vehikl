@@ -10,13 +10,12 @@ use Tests\TestCase;
 
 class GameStateTest extends TestCase
 {
-    /**  */
     public function testInitializes(): void
     {
         $gameState = new GameState(5);
 
         $this->assertInstanceOf(GameState::class, $gameState);
-        $this->assertCount(25, $gameState->toArray());
+        $this->assertCount(25, $gameState->toArray()['tiles']);
         $this->assertIsInt($gameState->getMaxPlayers());
     }
 
@@ -62,7 +61,7 @@ class GameStateTest extends TestCase
         $gameState = new GameState(5);
         $nextLocation = $gameState->getNextStartLocation();
 
-        $player = new Player();
+        $player = new Player('abc123');
         $gameState->addPlayer($player);
 
         $this->assertCount(1, $gameState->getPlayers());
@@ -78,13 +77,13 @@ class GameStateTest extends TestCase
     {
         $gameState = new GameState(5);
 
-        $player1 = new Player();
+        $player1 = new Player('abc123');
         $gameState->addPlayer($player1);
 
-        $player2 = new Player();
+        $player2 = new Player('abc456');
         $gameState->addPlayer($player2);
 
-        $player3 = new Player();
+        $player3 = new Player('abc789');
         $gameState->addPlayer($player3);
 
         $this->assertCount(3, $gameState->getPlayers());
@@ -109,7 +108,7 @@ class GameStateTest extends TestCase
         $gameState = new GameState(5);
         $nextLocation = $gameState->getNextStartLocation();
 
-        $player1 = new Player();
+        $player1 = new Player('abc123');
         $gameState->addPlayer($player1);
 
         $this->assertTrue($nextLocation->isOccupied());
@@ -132,5 +131,17 @@ class GameStateTest extends TestCase
                 'y' => 4
             ],
         ];
+    }
+
+    public function testItUpdatesOnATick(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('abc321'));
+        $player1 = $gameState->getPlayers()[0];
+        $start = $player1->getLocation();
+
+        $gameState->nextTick();
+
+        $this->assertNotEquals($start, $player1->getLocation());
     }
 }

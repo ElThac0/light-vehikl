@@ -3,11 +3,15 @@
 namespace App\Models;
 
 
+use App\Enums\Direction;
 use App\PlayerStatus;
 
 class Player
 {
     protected PlayerStatus $status = PlayerStatus::WAITING;
+    public int $x;
+    public int $y;
+    public Direction $direction;
 
     public function __construct(public string $id)
     {
@@ -30,6 +34,8 @@ class Player
     public function setStatus(PlayerStatus $playerStatus): self
     {
         $this->status = $playerStatus;
+
+        return $this;
     }
 
     public function getStatus(): PlayerStatus
@@ -37,4 +43,30 @@ class Player
         return $this->status;
     }
 
+    public function setDirection(Direction $direction): Player
+    {
+        $this->direction = $direction;
+
+        return $this;
+    }
+
+    public function moveNorth(): void
+    {
+        $this->y--;
+    }
+
+    public function moveEast(): void
+    {
+        $this->x++;
+    }
+
+    public function moveSouth(): void
+    {
+        $this->y++;
+    }
+
+    public function moveWest(): void
+    {
+        $this->x--;
+    }
 }
