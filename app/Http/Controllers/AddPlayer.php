@@ -22,12 +22,8 @@ class AddPlayer extends Controller
 
         $player = new Player($playerId);
 
-//        try {
-            $gameState->addPlayer($player);
-            $gameState->save();
-//        } catch (Exception $exception) {
-//            return response($exception->getMessage(), 500);
-//        }
+        $gameState->addPlayer($player);
+        $gameState->save();
 
         PlayerJoined::dispatch($gameState);
     }

@@ -5,7 +5,7 @@ import {onMounted, ref, computed, watch} from "vue";
 window.Echo.channel('GameChannel')
     .listen('.player.joined', (event) => {
       console.log('player joined', event);
-      players.value = event.players;
+      activeGame.value.players = event.players;
     });
 
 const props = defineProps({
@@ -66,9 +66,12 @@ onMounted(async () => {
 
 <template>
   <button @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</button>
-  <div v-if="activeGame" id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
-    <Tile v-for="tile in board" :players="players" :x="tile.x" :y="tile.y" />
-  </div>
+  <template v-else>
+    <h2>In Game: {{ activeGame.id }}</h2>
+    <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
+      <Tile v-for="tile in board" :players="players" :x="tile.x" :y="tile.y" />
+    </div>
+  </template>
 </template>
 
 <style>

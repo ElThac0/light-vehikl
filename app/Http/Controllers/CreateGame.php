@@ -15,8 +15,7 @@ class CreateGame extends Controller
     public function __invoke(Request $request)
     {
         $gameState = new GameState(self::ARENA_SIZE);
-
-        $player = new Player();
+        $player = new Player($request->session()->getId());
 
         $gameState->addPlayer($player);
         $request->session()->put('active_game', $gameState->getId());
