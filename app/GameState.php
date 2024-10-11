@@ -42,14 +42,14 @@ class GameState
     public function getStartLocations(): array
     {
         return [
-            $this->getTile(0, 0),
-            $this->getTile(0, $this->maxY),
-            $this->getTile($this->maxX, 0),
-            $this->getTile($this->maxY, $this->maxY),
+            [$this->getTile(0, 0), Direction::EAST],
+            [$this->getTile(0, $this->maxY), Direction::NORTH],
+            [$this->getTile($this->maxX, 0), Direction::SOUTH],
+            [$this->getTile($this->maxY, $this->maxY), Direction::WEST],
         ];
     }
 
-    public function getNextStartLocation(): Tile
+    public function getNextStartLocation(): array
     {
         return $this->getStartLocations()[count($this->getPlayers())];
     }
@@ -73,8 +73,9 @@ class GameState
             throw new Exception('Max players reached');
         }
 
-        $location = $this->getNextStartLocation();
-        $this->players[] = $player->setLocation($location->getCoords())->setDirection(Direction::SOUTH);
+        [$location, $direction] = $this->getNextStartLocation();
+        $coords = $location->getCoords();
+        $this->players[] = $player->setLocation($coords)->setDirection($direction);
         $location->setContents($player);
     }
 

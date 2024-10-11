@@ -39,7 +39,7 @@ class GameStateTest extends TestCase
 
         $startLocations = $gameState->getStartLocations();
 
-        $this->assertInstanceOf(Tile::class, $startLocations[0]);
+        $this->assertInstanceOf(Tile::class, $startLocations[0][0]);
 
         $this->assertCount(
             $gameState->getMaxPlayers(),
@@ -59,7 +59,7 @@ class GameStateTest extends TestCase
     public function testItCanAddAPlayer(): void
     {
         $gameState = new GameState(5);
-        $nextLocation = $gameState->getNextStartLocation();
+        $nextLocation = $gameState->getNextStartLocation()[0];
 
         $player = new Player('abc123');
         $gameState->addPlayer($player);
@@ -106,7 +106,7 @@ class GameStateTest extends TestCase
     public function testItFindsPlayerInATile(): void
     {
         $gameState = new GameState(5);
-        $nextLocation = $gameState->getNextStartLocation();
+        $nextLocation = $gameState->getNextStartLocation()[0];
 
         $player1 = new Player('abc123');
         $gameState->addPlayer($player1);
