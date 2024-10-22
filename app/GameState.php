@@ -100,12 +100,41 @@ class GameState
 
     protected function movePlayer(Player $player): void
     {
+        $previousLocation = $player->getLocation();
+
         match ($player->direction) {
-          Direction::NORTH => $player->moveNorth(),
-          Direction::EAST => $player->moveEast(),
-          Direction::SOUTH => $player->moveSouth(),
-          Direction::WEST => $player->moveWest(),
+            Direction::NORTH => $player->moveNorth(),
+            Direction::EAST => $player->moveEast(),
+            Direction::SOUTH => $player->moveSouth(),
+            Direction::WEST => $player->moveWest(),
         };
+
+        $newLocation = $player->getLocation();
+
+        if (!$this->validMove($newLocation)) {
+            $player->setLocation($previousLocation);
+            $player->setStatus(PlayerStatus::CRASHED);
+        } else {
+            $this->getTile(...$previousLocation)->setContents('trail');
+            $this->getTile(...$newLocation)->setContents($player);
+        }
+    }
+
+    protected function validMove(array $location): bool
+    {
+        return (
+            $this->withinBounds($location) && !$this->getTile(...$location)->isOccupied()
+        );
+    }
+
+    protected function withinBounds(array $location): bool
+    {
+        return (
+            $location[0] >= 0 &&
+            $location[1] >= 0 &&
+            $location[0] < $this->arenaSize &&
+            $location[1] < $this->arenaSize
+        );
     }
 
     public function toArray(): array

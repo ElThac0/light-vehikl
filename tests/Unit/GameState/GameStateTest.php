@@ -1,11 +1,13 @@
 <?php
 
-namespace Tests;
+namespace Tests\Unit\GameState;
 
+use App\Events\GameUpdated;
 use App\GameState;
 use App\Models\Player;
 use App\PlayerStatus;
 use App\Tile;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class GameStateTest extends TestCase
@@ -135,6 +137,8 @@ class GameStateTest extends TestCase
 
     public function testItUpdatesOnATick(): void
     {
+        Event::fake();
+
         $gameState = new GameState(5);
         $gameState->addPlayer(new Player('abc321'));
         $player1 = $gameState->getPlayers()[0];
@@ -143,5 +147,6 @@ class GameStateTest extends TestCase
         $gameState->nextTick();
 
         $this->assertNotEquals($start, $player1->getLocation());
+        Event::assertDispatched(GameUpdated::class);
     }
 }
