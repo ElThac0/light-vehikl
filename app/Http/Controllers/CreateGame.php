@@ -7,6 +7,7 @@ use App\GameState;
 use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Laravel\Octane\Facades\Octane;
 
 class CreateGame extends Controller
 {

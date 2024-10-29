@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\GameState;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Octane\Facades\Octane;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Octane::tick("game-state", function () {
+            dump('hey');
+            $gameList = Cache::get('game_list');
+
+            if (! $gameList) {
+                return;
+            }
+
+            collect($gameList)->each(function ($gameId) {
+                $game = GameState::find($gameId);
+                $game->nextTick();
+                $game->save();
+            });
+        })
+            ->seconds(2);
     }
 }
