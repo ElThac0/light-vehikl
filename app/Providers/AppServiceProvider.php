@@ -36,6 +36,6 @@ class AppServiceProvider extends ServiceProvider
                 $game->save();
             });
         })
-            ->seconds(2);
+            ->seconds(1);
     }
 }
