@@ -18,6 +18,11 @@ class Player
 
     }
 
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
     public function getLocation(): array
     {
         return [$this->x, $this->y];

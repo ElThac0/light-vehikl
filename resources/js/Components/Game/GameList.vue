@@ -2,7 +2,7 @@
   <ol>
     <li v-for="game in gameList">
       {{ game }}
-      <button @click="joinGame(game)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      <button v-if="activeGame?.id != game" @click="joinGame(game)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Join Game
       </button>
     </li>
@@ -13,6 +13,7 @@
 const emit = defineEmits(['joined-game']);
 const props = defineProps({
   gameList: Array,
+  activeGame: Object,
 });
 
 async function joinGame(id) {

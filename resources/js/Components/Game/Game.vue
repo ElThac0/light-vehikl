@@ -3,16 +3,6 @@ import Tile from './Tile.vue'
 import {onMounted, ref, computed, watch} from "vue";
 import GameList from "@/Components/Game/GameList.vue";
 
-window.Echo.channel('GameChannel')
-    .listen('.player.joined', (event) => {
-      console.log('player joined', event);
-      activeGame.value.players = event.players;
-    })
-    .listen('.game.updated', (event) => {
-      console.log('game updated', event);
-      activeGame.value.players = event.players;
-    });
-
 const props = defineProps({
   sessionId: String,
   gameList: Array,
@@ -39,12 +29,22 @@ const createGame = async () => {
   const response = await axios.post(route('game.create'));
 
   if (response.data?.id) {
-    activeGame.value = response.data;
+    setActiveGame(response.data);
   }
 }
 
 const setActiveGame = (gameState) => {
   activeGame.value = gameState;
+
+  window.Echo.channel('GameChannel')
+      .listen('.player.joined', (event) => {
+        console.log('player joined', event);
+        activeGame.value.players = event.players;
+      })
+      .listen('.game.updated', (event) => {
+        console.log('game updated', event);
+        activeGame.value.players = event.players;
+      });
 }
 
 const getActiveGame = async () => {
@@ -68,14 +68,14 @@ onMounted(async () => {
   const game = await getActiveGame();
 
   if (game?.id) {
-    activeGame.value = game;
+    setActiveGame(game);
   }
 });
 
 </script>
 
 <template>
-  <GameList :gameList="gameList" @joined-game="setActiveGame"/>
+  <GameList :gameList="gameList" :activeGame="activeGame" @joined-game="setActiveGame"/>
   <button @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</button>
   <template v-else>
     <h2>In Game: {{ activeGame.id }}</h2>

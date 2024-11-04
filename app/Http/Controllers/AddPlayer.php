@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\PlayerJoined;
 use App\GameState;
 use App\Models\Player;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -20,11 +18,15 @@ class AddPlayer extends Controller
 
         $playerId = $request->session()->getId();
 
+        // TODO: Determine if the player is already in the game
+            // if so, return that player
+            // else add the player new
         $player = new Player($playerId);
-
         $gameState->addPlayer($player);
         $gameState->save();
 
-        PlayerJoined::dispatch($gameState);
+        $request->session()->put('active_game', $gameState->getId());
+
+        return response()->json($gameState->toArray());
     }
 }

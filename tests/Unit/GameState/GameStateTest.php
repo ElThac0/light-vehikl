@@ -149,4 +149,16 @@ class GameStateTest extends TestCase
         $this->assertNotEquals($start, $player1->getLocation());
         Event::assertDispatched(GameUpdated::class);
     }
+
+    public function testDetermineIfThePlayerIsInTheGame(): void
+    {
+        $gameState = new GameState(5);
+
+        $player1 = new Player('abc123');
+        $player2 = new Player('taco');
+        $gameState->addPlayer($player1);
+
+        $this->assertTrue($gameState->isInGame($player1));
+        $this->assertFalse($gameState->isInGame($player2));
+    }
 }

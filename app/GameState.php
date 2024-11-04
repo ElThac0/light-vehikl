@@ -73,6 +73,10 @@ class GameState
             throw new Exception('Max players reached');
         }
 
+        if ($this->isInGame($player)) {
+            throw new Exception('Player already in game');
+        }
+
         [$location, $direction] = $this->getNextStartLocation();
         $coords = $location->getCoords();
         $this->players[] = $player->setLocation($coords)->setDirection($direction);
@@ -145,5 +149,15 @@ class GameState
             'tiles' => $this->arena,
             'players' => $this->players,
         ];
+    }
+
+    public function isInGame(Player $player): bool
+    {
+        foreach ($this->getPlayers() as $currentPlayer) {
+            if ($player->getId() === $currentPlayer->getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
