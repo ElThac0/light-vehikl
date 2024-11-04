@@ -1,7 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 import Game from '@/Components/Game/Game.vue'
-import GameList from "@/Components/Game/GameList.vue";
 
 defineProps({
     canLogin: {
@@ -25,6 +24,10 @@ defineProps({
         type: Array,
     }
 });
+
+function setActiveGame(gameState) {
+
+}
 
 function handleImageError() {
     document.getElementById('screenshot-container')?.classList.add('!hidden');
@@ -84,8 +87,7 @@ function handleImageError() {
                 </header>
 
                 <main class="mt-6">
-                  <GameList :gameList="gameList" />
-                  <Game :sessionId="sessionId"/>
+                  <Game :sessionId="sessionId" :gameList="gameList" />
                 </main>
 
                 <footer class="py-16 text-center text-sm text-black dark:text-white/70">

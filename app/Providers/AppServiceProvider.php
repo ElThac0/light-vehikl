@@ -23,7 +23,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Octane::tick("game-state", function () {
-            dump('hey');
             $gameList = Cache::get('game_list');
 
             if (! $gameList) {

@@ -10,6 +10,7 @@
 </template>
 
 <script setup>
+const emit = defineEmits(['joined-game']);
 const props = defineProps({
   gameList: Array,
 });
@@ -19,7 +20,7 @@ async function joinGame(id) {
     const response = await axios.post(route('game.join', id));
 
     if (response.data?.id) {
-      activeGame.value = response.data;
+      emit('joined-game', response.data);
     }
   } catch (e) {
     alert(`Couldn't join the game: ${e.response.data.message}`);

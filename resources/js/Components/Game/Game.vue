@@ -1,6 +1,7 @@
 <script setup>
 import Tile from './Tile.vue'
 import {onMounted, ref, computed, watch} from "vue";
+import GameList from "@/Components/Game/GameList.vue";
 
 window.Echo.channel('GameChannel')
     .listen('.player.joined', (event) => {
@@ -14,6 +15,7 @@ window.Echo.channel('GameChannel')
 
 const props = defineProps({
   sessionId: String,
+  gameList: Array,
 });
 
 const activeGame = ref(null);
@@ -39,6 +41,10 @@ const createGame = async () => {
   if (response.data?.id) {
     activeGame.value = response.data;
   }
+}
+
+const setActiveGame = (gameState) => {
+  activeGame.value = gameState;
 }
 
 const getActiveGame = async () => {
@@ -69,6 +75,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <GameList :gameList="gameList" @joined-game="setActiveGame"/>
   <button @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</button>
   <template v-else>
     <h2>In Game: {{ activeGame.id }}</h2>
