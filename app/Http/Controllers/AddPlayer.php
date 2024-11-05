@@ -18,9 +18,6 @@ class AddPlayer extends Controller
 
         $playerId = $request->session()->getId();
 
-        // TODO: Determine if the player is already in the game
-            // if so, return that player
-            // else add the player new
         $player = new Player($playerId);
         $gameState->addPlayer($player);
         $gameState->save();
