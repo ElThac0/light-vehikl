@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\GameState;
 
+use App\Enums\ContentType;
 use App\Events\GameUpdated;
 use App\GameState;
 use App\Models\Player;
@@ -108,13 +109,13 @@ class GameStateTest extends TestCase
     public function testItFindsPlayerInATile(): void
     {
         $gameState = new GameState(5);
-        $nextLocation = $gameState->getNextStartLocation()[0];
+        $nextLocation = $gameState->getNextStartLocation()[1][0];
 
         $player1 = new Player('abc123');
         $gameState->addPlayer($player1);
 
         $this->assertTrue($nextLocation->isOccupied());
-        $this->assertEquals($player1, $nextLocation->getContents());
+        $this->assertEquals(ContentType::PLAYER1, $nextLocation->getContents());
     }
 
     public static function tileCoordinates(): array

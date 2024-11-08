@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Enums\ContentType;
 use App\Events\GameUpdated;
 use App\Models\Player;
 use Exception;
@@ -42,16 +43,18 @@ class GameState
     public function getStartLocations(): array
     {
         return [
-            [$this->getTile(0, 0), Direction::EAST],
-            [$this->getTile(0, $this->maxY), Direction::NORTH],
-            [$this->getTile($this->maxX, 0), Direction::SOUTH],
-            [$this->getTile($this->maxY, $this->maxY), Direction::WEST],
+            ContentType::PLAYER1->value => [$this->getTile(0, 0), Direction::EAST],
+            ContentType::PLAYER2->value => [$this->getTile(0, $this->maxY), Direction::NORTH],
+            ContentType::PLAYER3->value => [$this->getTile($this->maxX, 0), Direction::SOUTH],
+            ContentType::PLAYER4->value => [$this->getTile($this->maxY, $this->maxY), Direction::WEST],
         ];
     }
 
     public function getNextStartLocation(): array
     {
-        return $this->getStartLocations()[count($this->getPlayers())];
+        $nextPlayerCount = count($this->getPlayers()) + 1;
+        $nextPlayerType = ContentType::playerByNumber($nextPlayerCount);
+        return [$nextPlayerType, $this->getStartLocations()[$nextPlayerType->value]];
     }
 
     public function getPlayers(): array
@@ -77,10 +80,11 @@ class GameState
             throw new Exception('Player already in game');
         }
 
-        [$location, $direction] = $this->getNextStartLocation();
+        [$playerEnum, $vector] = $this->getNextStartLocation();
+        [$location, $direction] = $vector;
         $coords = $location->getCoords();
         $this->players[] = $player->setLocation($coords)->setDirection($direction);
-        $location->setContents($player);
+        $location->setContents($playerEnum);
     }
 
     public function save(): self
@@ -139,6 +143,16 @@ class GameState
             $location[0] < $this->arenaSize &&
             $location[1] < $this->arenaSize
         );
+    }
+
+    protected function serializeArena(): string
+    {
+        return array_reduce($this->arena, function (string $carry, Tile $tile) { return $carry . $tile->getContents(); }, "");
+    }
+
+    protected function serializeTile(Tile $tile): ContentType
+    {
+        return $tile->getContents();
     }
 
     public function toArray(): array

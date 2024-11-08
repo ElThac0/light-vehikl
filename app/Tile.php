@@ -2,9 +2,11 @@
 
 namespace App;
 
+use App\Enums\ContentType;
+
 class Tile
 {
-    private mixed $contents = null;
+    private ContentType $contents = ContentType::EMPTY;
 
     public function __construct(public int $x, public int $y)
     {
@@ -25,19 +27,19 @@ class Tile
         return [$this->x, $this->y];
     }
     
-    public function setContents(mixed $thing): self
+    public function setContents(ContentType $thing): self
     {
         $this->contents = $thing;
         return $this;
     }
     
-    public function getContents(): mixed
+    public function getContents(): ContentType
     {
         return $this->contents;
     }
 
     public function isOccupied(): bool
     {
-        return !!$this->contents;
+        return $this->contents !== ContentType::EMPTY;
     }
 }
