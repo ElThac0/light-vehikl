@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\GameState;
+use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Octane\Facades\Octane;

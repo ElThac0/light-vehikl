@@ -25,4 +25,15 @@ enum ContentType: int
             default => null
         };
     }
+
+    public function trailType(): ?self
+    {
+        return match ($this) {
+            self::PLAYER1 => self::PLAYER1_TRAIL,
+            self::PLAYER2 => self::PLAYER2_TRAIL,
+            self::PLAYER3 => self::PLAYER3_TRAIL,
+            self::PLAYER4 => self::PLAYER4_TRAIL,
+            default => null
+        };
+    }
 }

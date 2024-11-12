@@ -3,11 +3,11 @@
 namespace Tests\Unit\GameState;
 
 use App\Enums\ContentType;
+use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
-use App\GameState;
-use App\Models\Player;
-use App\PlayerStatus;
-use App\Tile;
+use App\GameObjects\GameState;
+use App\GameObjects\Player;
+use App\GameObjects\Tile;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -42,7 +42,7 @@ class GameStateTest extends TestCase
 
         $startLocations = $gameState->getStartLocations();
 
-        $this->assertInstanceOf(Tile::class, $startLocations[0][0]);
+        $this->assertInstanceOf(Tile::class, $startLocations[0]->tile);
 
         $this->assertCount(
             $gameState->getMaxPlayers(),
@@ -62,13 +62,13 @@ class GameStateTest extends TestCase
     public function testItCanAddAPlayer(): void
     {
         $gameState = new GameState(5);
-        $nextLocation = $gameState->getNextStartLocation()[0];
+        $nextLocation = $gameState->getNextStartLocation()->tile;
 
         $player = new Player('abc123');
         $gameState->addPlayer($player);
 
         $this->assertCount(1, $gameState->getPlayers());
-        $player = $gameState->getPlayers()[0];
+        $player = $gameState->getPlayer(ContentType::PLAYER1);
         $this->assertInstanceOf(Player::class, $player);
         $this->assertEquals($nextLocation->getCoords(), $player->getLocation());
         $this->assertIsInt($player->getLocation()[0]);
@@ -109,13 +109,13 @@ class GameStateTest extends TestCase
     public function testItFindsPlayerInATile(): void
     {
         $gameState = new GameState(5);
-        $nextLocation = $gameState->getNextStartLocation()[1][0];
+        $nextLocation = $gameState->getNextStartLocation();
 
         $player1 = new Player('abc123');
         $gameState->addPlayer($player1);
 
-        $this->assertTrue($nextLocation->isOccupied());
-        $this->assertEquals(ContentType::PLAYER1, $nextLocation->getContents());
+        $this->assertTrue($nextLocation->tile->isOccupied());
+        $this->assertEquals(ContentType::PLAYER1, $nextLocation->tile->getContents());
     }
 
     public static function tileCoordinates(): array
@@ -142,7 +142,7 @@ class GameStateTest extends TestCase
 
         $gameState = new GameState(5);
         $gameState->addPlayer(new Player('abc321'));
-        $player1 = $gameState->getPlayers()[0];
+        $player1 = $gameState->getPlayer(ContentType::PLAYER1);
         $start = $player1->getLocation();
 
         $gameState->nextTick();

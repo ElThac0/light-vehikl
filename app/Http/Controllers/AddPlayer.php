@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\GameState;
-use App\Models\Player;
+use App\GameObjects\GameState;
+use App\GameObjects\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 

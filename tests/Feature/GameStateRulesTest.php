@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ContentType;
 use App\Enums\Direction;
-use App\GameState;
-use App\Models\Player;
-use App\PlayerStatus;
+use App\Enums\PlayerStatus;
+use App\GameObjects\GameState;
+use App\GameObjects\Player;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -23,12 +24,12 @@ class GameStateRulesTest extends TestCase
             $gameState->nextTick();
         }
 
-        $playerPosition = $gameState->getPlayers()[0]->getLocation();
+        $playerPosition = $gameState->getPlayer(ContentType::PLAYER1)->getLocation();
         $this->assertLessThanOrEqual($arenaSize, $playerPosition[0]);
         $this->assertLessThanOrEqual($arenaSize, $playerPosition[1]);
         $this->assertGreaterThanOrEqual(0, $playerPosition[0]);
         $this->assertGreaterThanOrEqual(0, $playerPosition[1]);
-        $this->assertEquals(PlayerStatus::CRASHED, $gameState->getPlayers()[0]->getStatus());
+        $this->assertEquals(PlayerStatus::CRASHED, $gameState->getPlayer(ContentType::PLAYER1)->getStatus());
     }
 
     function testItPreventsPlayerMovingIntoOccupiedSquare(): void
@@ -42,10 +43,10 @@ class GameStateRulesTest extends TestCase
         $player->setDirection(Direction::EAST);
 
         $nextTile = $gameState->getTile(1,0);
-        $nextTile->setContents('wall');
+        $nextTile->setContents(ContentType::WALL);
 
         $gameState->nextTick();
 
-        $this->assertEquals(PlayerStatus::CRASHED, $gameState->getPlayers()[0]->getStatus());
+        $this->assertEquals(PlayerStatus::CRASHED, $gameState->getPlayers()[ContentType::PLAYER1->value]->getStatus());
     }
 }

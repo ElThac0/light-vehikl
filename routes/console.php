@@ -1,6 +1,6 @@
 <?php
 
-use App\GameState;
+use App\GameObjects\GameState;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;

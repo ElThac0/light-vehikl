@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\GameObjects;
 
 
+use App\Enums\ContentType;
 use App\Enums\Direction;
-use App\PlayerStatus;
+use App\Enums\PlayerStatus;
 
 class Player
 {
@@ -12,6 +13,7 @@ class Player
     public int $x;
     public int $y;
     public Direction $direction;
+    public ContentType $slot;
 
     public function __construct(public string $id)
     {
@@ -73,5 +75,15 @@ class Player
     public function moveWest(): void
     {
         $this->x--;
+    }
+
+    public function setSlot(ContentType $playerEnum)
+    {
+        $this->slot = $playerEnum;
+    }
+
+    public function getSlot(): ContentType
+    {
+        return $this->slot;
     }
 }

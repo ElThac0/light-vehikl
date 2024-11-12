@@ -1,14 +1,14 @@
 <?php
 
-namespace App;
+namespace App\GameObjects;
 
 use App\Enums\ContentType;
+use App\Enums\Direction;
+use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
-use App\Models\Player;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Ramsey\Uuid\Uuid;
-use App\Enums\Direction;
 
 class GameState
 {
@@ -43,23 +43,27 @@ class GameState
     public function getStartLocations(): array
     {
         return [
-            ContentType::PLAYER1->value => [$this->getTile(0, 0), Direction::EAST],
-            ContentType::PLAYER2->value => [$this->getTile(0, $this->maxY), Direction::NORTH],
-            ContentType::PLAYER3->value => [$this->getTile($this->maxX, 0), Direction::SOUTH],
-            ContentType::PLAYER4->value => [$this->getTile($this->maxY, $this->maxY), Direction::WEST],
+            new StartLocation(ContentType::PLAYER1, $this->getTile(0, 0), Direction::EAST),
+            new StartLocation(ContentType::PLAYER2, $this->getTile(0, $this->maxY), Direction::NORTH),
+            new StartLocation(ContentType::PLAYER3, $this->getTile($this->maxX, 0), Direction::SOUTH),
+            new StartLocation(ContentType::PLAYER4, $this->getTile($this->maxY, $this->maxY), Direction::WEST),
         ];
     }
 
-    public function getNextStartLocation(): array
+    public function getNextStartLocation(): StartLocation
     {
-        $nextPlayerCount = count($this->getPlayers()) + 1;
-        $nextPlayerType = ContentType::playerByNumber($nextPlayerCount);
-        return [$nextPlayerType, $this->getStartLocations()[$nextPlayerType->value]];
+        $startIndex = count($this->getPlayers());
+        return $this->getStartLocations()[$startIndex];
     }
 
     public function getPlayers(): array
     {
         return $this->players;
+    }
+
+    public function getPlayer(ContentType $playerType): Player
+    {
+        return $this->players[$playerType->value];
     }
 
     public function getId(): string
@@ -80,11 +84,12 @@ class GameState
             throw new Exception('Player already in game');
         }
 
-        [$playerEnum, $vector] = $this->getNextStartLocation();
-        [$location, $direction] = $vector;
-        $coords = $location->getCoords();
-        $this->players[] = $player->setLocation($coords)->setDirection($direction);
-        $location->setContents($playerEnum);
+        $start = $this->getNextStartLocation();
+        $coords = $start->tile->getCoords();
+        $playerEnum = $start->playerType;
+        $player->setSlot($playerEnum);
+        $this->players[$playerEnum->value] = $player->setLocation($coords)->setDirection($start->direction);
+        $start->tile->setContents($playerEnum);
     }
 
     public function save(): self
@@ -100,7 +105,7 @@ class GameState
 
     public function nextTick(): void
     {
-        foreach($this->getPlayers() as $player) {
+        foreach($this->getPlayers() as $playerSlot => $player) {
             $this->movePlayer($player);
         }
         GameUpdated::dispatch($this);
@@ -108,6 +113,8 @@ class GameState
 
     protected function movePlayer(Player $player): void
     {
+        $playerType = $this->getPlayerType($player);
+        $playerTrail = $playerType->trailType();
         $previousLocation = $player->getLocation();
 
         match ($player->direction) {
@@ -123,9 +130,14 @@ class GameState
             $player->setLocation($previousLocation);
             $player->setStatus(PlayerStatus::CRASHED);
         } else {
-            $this->getTile(...$previousLocation)->setContents('trail');
-            $this->getTile(...$newLocation)->setContents($player);
+            $this->getTile(...$previousLocation)->setContents($playerTrail);
+            $this->getTile(...$newLocation)->setContents($playerType);
         }
+    }
+
+    protected function getPlayerType(Player $player): ContentType
+    {
+        return $player->getSlot();
     }
 
     protected function validMove(array $location): bool
@@ -160,8 +172,7 @@ class GameState
         return [
             'id' => $this->id,
             'arenaSize' => $this->arenaSize,
-            'tiles' => $this->arena,
-            'players' => $this->players,
+            'players' => array_values($this->players),
         ];
     }
 
