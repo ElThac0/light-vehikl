@@ -1,16 +1,12 @@
 <script setup>
 
-import {computed, reactive} from "vue";
+import { computed } from "vue";
 
 const props = defineProps({
-  players: {x: Number, y: Number},
-  x: Number,
-  y: Number,
+  contents: Number,
 });
 
-const isPlayerHere = computed(() => {
-  return props.players.some(player => props.x === player.x && props.y === player.y);
-});
+const occupied = computed(() => props.contents !== 0);
 
 </script>
 
@@ -18,7 +14,7 @@ const isPlayerHere = computed(() => {
   <div
     :class="{
       tile: true,
-      player1: isPlayerHere,
+      occupied,
     }"
   ></div>
 </template>
@@ -29,7 +25,7 @@ const isPlayerHere = computed(() => {
   border: 1px solid navy;
 }
 
-.player1 {
+.occupied {
   background-color: lime;
 }
 </style>

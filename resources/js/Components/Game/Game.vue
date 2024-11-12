@@ -38,11 +38,10 @@ const setActiveGame = (gameState) => {
   window.Echo.channel('GameChannel')
       .listen('.player.joined', (event) => {
         console.log('player joined', event);
-        activeGame.value.players = event.players;
       })
       .listen('.game.updated', (event) => {
         console.log('game updated', event);
-        activeGame.value.players = event.players;
+        activeGame.value = event;
       });
 }
 
@@ -79,7 +78,7 @@ onMounted(async () => {
   <template v-else>
     <h2>In Game: {{ activeGame.id }}</h2>
     <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
-      <Tile v-for="tile in board" :players="players" :x="tile.x" :y="tile.y" />
+      <Tile v-for="(tile, idx) in board" :contents="tile" :key="idx" />
     </div>
   </template>
 </template>

@@ -157,9 +157,9 @@ class GameState
         );
     }
 
-    protected function serializeArena(): string
+    protected function serializeArena(): array
     {
-        return array_reduce($this->arena, function (string $carry, Tile $tile) { return $carry . $tile->getContents(); }, "");
+        return array_map([$this, 'serializeTile'], $this->arena);
     }
 
     protected function serializeTile(Tile $tile): ContentType
@@ -172,6 +172,7 @@ class GameState
         return [
             'id' => $this->id,
             'arenaSize' => $this->arenaSize,
+            'tiles' => $this->serializeArena(),
             'players' => array_values($this->players),
         ];
     }
