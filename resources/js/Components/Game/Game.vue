@@ -78,7 +78,7 @@ onMounted(async () => {
   <template v-else>
     <h2>In Game: {{ activeGame.id }}</h2>
     <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
-      <Tile v-for="(tile, idx) in board" :contents="tile" :key="idx" />
+      <Tile v-for="(tile, idx) in board" :contents="tile" :players="players" :key="idx" />
     </div>
   </template>
 </template>

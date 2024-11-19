@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Enums;
-enum PlayerStatus
+enum PlayerStatus: string
 {
-    case WAITING;
-    case ACTIVE;
-    case CRASHED;
+    case WAITING = 'waiting';
+    case ACTIVE = 'active';
+    case CRASHED = 'crashed';
 }

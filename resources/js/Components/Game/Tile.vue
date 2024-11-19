@@ -4,10 +4,10 @@ import { computed } from "vue";
 
 const props = defineProps({
   contents: Number,
+  players: Array,
 });
 
 const player = computed(() => {
-  console.log(props.contents);
     switch(props.contents)
     {
       case 2:
@@ -27,6 +27,13 @@ const player = computed(() => {
     }
 });
 
+const crashed = computed(() => {
+  if ([2, 4, 6, 8].includes(props.contents)) {
+    return props.players.find((value) => value.slot === props.contents)?.status === 'crashed';
+  }
+  return false;
+});
+
 </script>
 
 <template>
@@ -34,6 +41,7 @@ const player = computed(() => {
     :class="{
       tile: true,
       [player]: true,
+      crashed: crashed,
     }"
   ></div>
 </template>
@@ -49,7 +57,7 @@ const player = computed(() => {
 }
 
 .player-2 {
-  background-color: red;
+  background-color: #00eaff;
 }
 
 .player-3 {
@@ -60,7 +68,7 @@ const player = computed(() => {
   background-color: orange;
 }
 
-.occupied {
-  background-color: lime;
+.crashed {
+  background-color: red;
 }
 </style>

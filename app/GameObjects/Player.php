@@ -9,7 +9,7 @@ use App\Enums\PlayerStatus;
 
 class Player
 {
-    protected PlayerStatus $status = PlayerStatus::WAITING;
+    public PlayerStatus $status = PlayerStatus::WAITING;
     public int $x;
     public int $y;
     public Direction $direction;
