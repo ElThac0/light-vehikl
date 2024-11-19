@@ -8,6 +8,7 @@ use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Laravel\Octane\Facades\Octane;
 use Ramsey\Uuid\Uuid;
 
 class GameState
@@ -94,7 +95,11 @@ class GameState
 
     public function save(): self
     {
-        Cache::set("game_state.{$this->id}", $this);
+        Octane::table('gameState')->set($this->id, [
+            'id' => $this->id,
+            'arena' => join($this->serializeArena()),
+            'players' => json_encode($this->serializePlayers()),
+        ]);
         return $this;
     }
 
@@ -162,9 +167,14 @@ class GameState
         return array_map([$this, 'serializeTile'], $this->arena);
     }
 
-    protected function serializeTile(Tile $tile): ContentType
+    protected function serializeTile(Tile $tile): int
     {
-        return $tile->getContents();
+        return $tile->getContents()->value;
+    }
+
+    protected function serializePlayers(): array
+    {
+        return array_values($this->players);
     }
 
     public function toArray(): array
@@ -173,7 +183,7 @@ class GameState
             'id' => $this->id,
             'arenaSize' => $this->arenaSize,
             'tiles' => $this->serializeArena(),
-            'players' => array_values($this->players),
+            'players' => $this->serializePlayers(),
         ];
     }
 

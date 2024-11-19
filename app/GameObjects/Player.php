@@ -6,8 +6,9 @@ namespace App\GameObjects;
 use App\Enums\ContentType;
 use App\Enums\Direction;
 use App\Enums\PlayerStatus;
+use JsonSerializable;
 
-class Player
+class Player implements JsonSerializable
 {
     public PlayerStatus $status = PlayerStatus::WAITING;
     public int $x;
@@ -85,5 +86,14 @@ class Player
     public function getSlot(): ContentType
     {
         return $this->slot;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'status' => serialize($this->status),
+            'id' => $this->id,
+            'direction' => $this->direction->value,
+        ];
     }
 }

@@ -150,9 +150,10 @@ return [
     */
 
     'tables' => [
-        'example:1000' => [
-            'name' => 'string:1000',
-            'votes' => 'int',
+        'gameState:1000' => [
+            'id' => 'string:1000',
+            'arena' => 'string:2500',
+            'players' => 'string:1000',
         ],
     ],
 
