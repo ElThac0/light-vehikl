@@ -6,9 +6,7 @@ use App\Enums\ContentType;
 
 class Tile
 {
-    private ContentType $contents = ContentType::EMPTY;
-
-    public function __construct(public int $x, public int $y)
+    public function __construct(public int $x, public int $y, private ContentType $contents = ContentType::EMPTY)
     {
     }
 

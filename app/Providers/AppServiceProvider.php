@@ -34,7 +34,6 @@ class AppServiceProvider extends ServiceProvider
                 $game->nextTick();
                 $game->save();
             });
-        })
-            ->seconds(1);
+        })->seconds(1);
     }
 }

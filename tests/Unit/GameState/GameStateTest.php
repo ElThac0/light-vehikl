@@ -162,4 +162,21 @@ class GameStateTest extends TestCase
         $this->assertTrue($gameState->isInGame($player1));
         $this->assertFalse($gameState->isInGame($player2));
     }
+
+    public function testLoadsFromString(): void
+    {
+        $gameState = new GameState(2);
+
+        $gameStr = '1111';
+        $gameState->arenaFromString($gameStr);
+
+        $this->assertEquals(ContentType::WALL, $gameState->getTile(0,0)->getContents());
+        $this->assertEquals(ContentType::WALL, $gameState->getTile(1,1)->getContents());
+
+        $gameStr = '0234';
+        $gameState->arenaFromString($gameStr);
+
+        $this->assertEquals(ContentType::EMPTY, $gameState->getTile(0,0)->getContents());
+        $this->assertEquals(ContentType::PLAYER1, $gameState->getTile(1,0)->getContents());
+    }
 }

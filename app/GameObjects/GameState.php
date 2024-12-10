@@ -7,7 +7,6 @@ use App\Enums\Direction;
 use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use Exception;
-use Illuminate\Support\Facades\Cache;
 use Laravel\Octane\Facades\Octane;
 use Ramsey\Uuid\Uuid;
 
@@ -21,8 +20,8 @@ class GameState
 
     public function __construct(protected int $arenaSize)
     {
-        for ($x = 0; $x < $this->arenaSize; $x++) {
-            for ($y = 0; $y < $this->arenaSize; $y++) {
+        for ($y = 0; $y < $this->arenaSize; $y++) {
+            for ($x = 0; $x < $this->arenaSize; $x++) {
                 $this->arena[] = new Tile($x, $y);
             }
         }
@@ -32,8 +31,15 @@ class GameState
 
     public function getTile(int $x, int $y): Tile
     {
-        $addr = $x * $this->arenaSize + $y;
+        $addr = $y * $this->arenaSize + $x;
         return $this->arena[$addr];
+    }
+
+    public function keyToXY(int $key): array
+    {
+        $y = $key % $this->arenaSize;
+        $x = $this->arenaSize - ($y * $this->arenaSize);
+        return [$x, $y];
     }
 
     public function getMaxPlayers(): int
@@ -97,6 +103,7 @@ class GameState
     {
         Octane::table('gameState')->set($this->id, [
             'id' => $this->id,
+            'arenaSize' => $this->arenaSize,
             'arena' => join($this->serializeArena()),
             'players' => json_encode($this->serializePlayers()),
         ]);
@@ -105,7 +112,28 @@ class GameState
 
     public static function find($id): ?GameState
     {
-        return Cache::get("game_state.{$id}");
+        $dehydrated = Octane::table('gameState')->get($id);
+        return GameState::hydrate($dehydrated);
+    }
+
+    public static function hydrate(array $data): GameState
+    {
+        $gameState = new GameState($data['arenaSize']);
+        $gameState->arenaFromString($data['arena']);
+        return $gameState;
+    }
+
+    public function arenaFromString(string $input): void
+    {
+        $tileBits = str_split($input);
+        $this->arena = array_map(
+            function ($tile, $key) {
+                [$x, $y] = $this->keyToXY($key);
+                return new Tile($x, $y, ContentType::from($tile));
+            },
+            $tileBits,
+            array_keys($tileBits)
+        );
     }
 
     public function nextTick(): void
