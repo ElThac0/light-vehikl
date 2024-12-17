@@ -152,7 +152,7 @@ return [
     'tables' => [
         'gameState:1000' => [
             'id' => 'string:1000',
-            'arenaSize' => 'integer',
+            'arenaSize' => 'int',
             'arena' => 'string:2500',
             'players' => 'string:1000',
         ],

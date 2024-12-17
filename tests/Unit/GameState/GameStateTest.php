@@ -163,7 +163,7 @@ class GameStateTest extends TestCase
         $this->assertFalse($gameState->isInGame($player2));
     }
 
-    public function testLoadsFromString(): void
+    public function testLoadsArenaFromString(): void
     {
         $gameState = new GameState(2);
 
@@ -178,5 +178,20 @@ class GameStateTest extends TestCase
 
         $this->assertEquals(ContentType::EMPTY, $gameState->getTile(0,0)->getContents());
         $this->assertEquals(ContentType::PLAYER1, $gameState->getTile(1,0)->getContents());
+    }
+
+    public function testLoadsPlayersFromString(): void
+    {
+        $gameState = new GameState(2);
+
+        $player1 = new Player('abc123');
+        $gameState->addPlayer($player1);
+
+        $playerString = $gameState->playersToString();
+
+        $newGame = new GameState(2);
+        $newGame->playersFromString($playerString);
+
+        $this->assertEquals($gameState->getPlayers(), $newGame->getPlayers());
     }
 }

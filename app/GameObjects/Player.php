@@ -10,15 +10,14 @@ use JsonSerializable;
 
 class Player implements JsonSerializable
 {
-    public PlayerStatus $status = PlayerStatus::WAITING;
-    public int $x;
-    public int $y;
-    public Direction $direction;
-    public ContentType $slot;
-
-    public function __construct(public string $id)
-    {
-
+    public function __construct(
+        public string $id,
+        public PlayerStatus $status = PlayerStatus::WAITING,
+        public ?Direction $direction = null,
+        public ?ContentType $slot = null,
+        public ?int $x = null,
+        public ?int $y = null,
+    ) {
     }
 
     public function getId(): string
@@ -91,9 +90,23 @@ class Player implements JsonSerializable
     public function jsonSerialize(): mixed
     {
         return [
-            'status' => serialize($this->status),
+            'status' => $this->status->value,
             'id' => $this->id,
             'direction' => $this->direction->value,
+            'slot' => $this->slot,
+            'x' => $this->x,
+            'y' => $this->y,
         ];
+    }
+
+    public static function deserialize(array $data): self
+    {
+        return new self(
+            id: $data['id'],
+            status: PlayerStatus::tryFrom($data['status']),
+            direction: Direction::tryFrom($data['direction']),
+            slot: ContentType::tryFrom($data['slot']),
+            x: $data['x'],
+            y: $data['y']);
     }
 }

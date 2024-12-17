@@ -16,9 +16,8 @@ class GameState
     public array $arena;
     public array $players = [];
     protected int $maxX, $maxY;
-    protected string $id;
 
-    public function __construct(protected int $arenaSize)
+    public function __construct(protected int $arenaSize, protected $id = null)
     {
         for ($y = 0; $y < $this->arenaSize; $y++) {
             for ($x = 0; $x < $this->arenaSize; $x++) {
@@ -26,7 +25,7 @@ class GameState
             }
         }
         $this->maxX = $this->maxY = $this->arenaSize - 1;
-        $this->id = Uuid::uuid4();
+        $this->id = $id ?? Uuid::uuid4()->toString();
     }
 
     public function getTile(int $x, int $y): Tile
@@ -105,7 +104,7 @@ class GameState
             'id' => $this->id,
             'arenaSize' => $this->arenaSize,
             'arena' => join($this->serializeArena()),
-            'players' => json_encode($this->serializePlayers()),
+            'players' => $this->playersToString(),
         ]);
         return $this;
     }
@@ -113,14 +112,20 @@ class GameState
     public static function find($id): ?GameState
     {
         $dehydrated = Octane::table('gameState')->get($id);
-        return GameState::hydrate($dehydrated);
+        return GameState::hydrate($dehydrated, $id);
     }
 
-    public static function hydrate(array $data): GameState
+    public static function hydrate(array $data, string $id): GameState
     {
-        $gameState = new GameState($data['arenaSize']);
+        $gameState = new GameState($data['arenaSize'], $id);
         $gameState->arenaFromString($data['arena']);
+        $gameState->playersFromString($data['players']);
         return $gameState;
+    }
+
+    public function playersFromString(string $input): void
+    {
+        $this->players = $this->deserializePlayers(json_decode($input, true));
     }
 
     public function arenaFromString(string $input): void
@@ -203,6 +208,20 @@ class GameState
     protected function serializePlayers(): array
     {
         return array_values($this->players);
+    }
+
+    protected function deserializePlayers(array $playerArrays): array
+    {
+        $players = array_map(fn ($arr) => Player::deserialize($arr), $playerArrays);
+        return array_reduce($players, function (array $carry, Player $player) {
+            $carry[$player->getSlot()->value] = $player;
+            return $carry;
+        }, []);
+    }
+
+    public function playersToString(): string
+    {
+        return json_encode($this->serializePlayers());
     }
 
     public function toArray(): array
