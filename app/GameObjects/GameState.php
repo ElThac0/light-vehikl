@@ -36,8 +36,8 @@ class GameState
 
     public function keyToXY(int $key): array
     {
-        $y = $key % $this->arenaSize;
-        $x = $this->arenaSize - ($y * $this->arenaSize);
+        $y = floor($key / $this->arenaSize);
+        $x = $key - ($y * $this->arenaSize);
         return [$x, $y];
     }
 
@@ -144,7 +144,9 @@ class GameState
     public function nextTick(): void
     {
         foreach($this->getPlayers() as $playerSlot => $player) {
-            $this->movePlayer($player);
+            if ($player->getStatus() !== PlayerStatus::CRASHED) {
+                $this->movePlayer($player);
+            }
         }
         GameUpdated::dispatch($this);
     }
