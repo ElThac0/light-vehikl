@@ -12,14 +12,17 @@ class AddPlayer extends Controller
     public const ARENA_SIZE = 25;
 
     public function __invoke(Request $request, string $id) {
-        $gameState = Cache::remember("game_state.{$id}", 3600, function () {
-            return new GameState(self::ARENA_SIZE);
-        });
+        $gameState = GameState::find($id);
 
         $playerId = $request->session()->getId();
 
         $player = new Player($playerId);
-        $gameState->addPlayer($player);
+        try {
+            $gameState->addPlayer($player);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
+        }
+
         $gameState->save();
 
         $request->session()->put('active_game', $gameState->getId());
