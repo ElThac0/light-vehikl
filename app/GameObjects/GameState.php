@@ -67,6 +67,11 @@ class GameState
         return $this->players;
     }
 
+    public function findPlayer(string $playerId): Player
+    {
+        return collect($this->getPlayers())->first(fn (Player $player) => $player->getId() === $playerId);
+    }
+
     public function getPlayer(ContentType $playerType): Player
     {
         return $this->players[$playerType->value];

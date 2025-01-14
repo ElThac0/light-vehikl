@@ -18,9 +18,24 @@ const addPlayer = (player) => {
 }
 
 const handleKeyPress = (e) => {
+  let direction = null;
   switch (e.key) {
+    case 'w':
+      direction = 'NORTH';
+      break;
+    case 'a':
+      direction = 'WEST';
+      break;
     case 's':
-      console.log(e);
+      direction = 'SOUTH';
+      break;
+    case 'd':
+      direction = 'EAST';
+      break;
+  }
+
+  if (direction && activeGame.value?.id) {
+    axios.post(route('game.move', { id: activeGame.value.id }), { direction });
   }
 }
 
@@ -36,9 +51,6 @@ const setActiveGame = (gameState) => {
   activeGame.value = gameState;
 
   window.Echo.channel('GameChannel')
-      .listen('.player.joined', (event) => {
-        console.log('player joined', event);
-      })
       .listen('.game.updated', (event) => {
         console.log('game updated', event);
         activeGame.value = event;
