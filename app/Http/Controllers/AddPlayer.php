@@ -20,7 +20,7 @@ class AddPlayer extends Controller
         try {
             $gameState->addPlayer($player);
         } catch (\Exception $e) {
-            return response($e->getMessage(), 500);
+            return response()->json($e->getMessage(), 500);
         }
 
         $gameState->save();
