@@ -109,4 +109,9 @@ class Player implements JsonSerializable
             x: $data['x'],
             y: $data['y']);
     }
+
+    public function crashed(): bool
+    {
+        return $this->status === PlayerStatus::CRASHED;
+    }
 }

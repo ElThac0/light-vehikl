@@ -7,6 +7,7 @@ use App\Enums\Direction;
 use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use Exception;
+use Illuminate\Support\Collection;
 use Laravel\Octane\Facades\Octane;
 use Ramsey\Uuid\Uuid;
 
@@ -62,14 +63,14 @@ class GameState
         return $this->getStartLocations()[$startIndex];
     }
 
-    public function getPlayers(): array
+    public function getPlayers(): Collection
     {
-        return $this->players;
+        return collect($this->players);
     }
 
     public function findPlayer(string $playerId): Player
     {
-        return collect($this->getPlayers())->first(fn (Player $player) => $player->getId() === $playerId);
+        return $this->getPlayers()->first(fn (Player $player) => $player->getId() === $playerId);
     }
 
     public function getPlayer(ContentType $playerType): Player
@@ -249,5 +250,10 @@ class GameState
             }
         }
         return false;
+    }
+
+    public function isOver(): bool
+    {
+        return $this->getPlayers()->every(fn (Player $player) => $player->crashed());
     }
 }

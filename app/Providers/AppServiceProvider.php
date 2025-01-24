@@ -29,10 +29,16 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            collect($gameList)->each(function ($gameId) {
+            collect($gameList)->each(function ($gameId) use ($gameList) {
                 $game = GameState::find($gameId);
                 $game->nextTick();
                 $game->save();
+
+                if ($game->isOver()) {
+                    logger()->warning("Game {$gameId} is over");
+                    $gameList = array_filter($gameList, function ($item) use ($gameId) { return $item !== $gameId; });
+                    Cache::set('game_list', $gameList);
+                }
             });
         })->seconds(1);
     }

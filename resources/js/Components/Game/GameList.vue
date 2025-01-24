@@ -24,7 +24,7 @@ async function joinGame(id) {
       emit('joined-game', response.data);
     }
   } catch (e) {
-    alert(`Couldn't join the game: ${e.response.data}`);
+    alert(`Couldn't join the game: ${e.response.data.message}`);
   }
 }
 </script>
