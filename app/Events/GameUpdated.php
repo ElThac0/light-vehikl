@@ -21,7 +21,7 @@ class GameUpdated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('GameChannel'),
+            new Channel('GameChannel-' . $this->game->getId()),
         ];
     }
 

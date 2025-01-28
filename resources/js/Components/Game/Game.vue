@@ -56,7 +56,7 @@ const leaveGame = async () => {
 const setActiveGame = (gameState) => {
   activeGame.value = gameState;
 
-  window.Echo.channel('GameChannel')
+  window.Echo.channel('GameChannel-' + gameState?.id)
       .listen('.game.updated', (event) => {
         console.log('game updated', event);
         activeGame.value = event;
