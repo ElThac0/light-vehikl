@@ -50,6 +50,8 @@ const createGame = async () => {
 const leaveGame = async () => {
   await axios.post(route('game.leave', { id: activeGame.value?.id }));
 
+  window.Echo.leave('GameChannel-' + activeGame.value?.id);
+
   setActiveGame(null);
 }
 
