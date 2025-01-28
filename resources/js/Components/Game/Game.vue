@@ -47,6 +47,12 @@ const createGame = async () => {
   }
 }
 
+const leaveGame = async () => {
+  await axios.post(route('game.leave', { id: activeGame.value?.id }));
+
+  setActiveGame(null);
+}
+
 const setActiveGame = (gameState) => {
   activeGame.value = gameState;
 
@@ -67,10 +73,6 @@ const getActiveGame = async () => {
   }
 }
 
-const playerInGame = computed(() => {
-  return players.value.map(player => player.playerId).includes(props.sessionId)
-});
-
 onMounted(async () => {
   window.addEventListener('keydown', handleKeyPress);
 
@@ -87,8 +89,9 @@ onMounted(async () => {
 <template>
   <GameList :gameList="gameList" :activeGame="activeGame" @joined-game="setActiveGame"/>
   <button @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</button>
-  <template v-else>
-    <h2>In Game: {{ activeGame.id }}</h2>
+  <button @click="leaveGame" v-if="activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Leave Game</button>
+  <template v-if="activeGame">
+    <h2>In Game: {{ activeGame?.id }}</h2>
     <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
       <Tile v-for="(tile, idx) in board" :contents="tile" :players="players" :key="idx" />
     </div>

@@ -4,6 +4,7 @@ use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\CreateGame;
 use App\Http\Controllers\GameMove;
 use App\Http\Controllers\GetGame;
+use App\Http\Controllers\LeaveGame;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
@@ -24,8 +25,6 @@ Route::get('/', function () {
     ]);
 });
 
-//Route::get('/game', [GameController::class, 'index'])->name('game.index');
-
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -41,5 +40,6 @@ Route::get('/my-game', GetGame::class)->name('game.my');
 Route::post('/game/{id}/move', GameMove::class)->name('game.move');
 
 Route::post('/join-game/{id}', JoinGame::class)->name('game.join');
+Route::post('/leave-game/{id}', LeaveGame::class)->name('game.leave');
 
 require __DIR__.'/auth.php';
