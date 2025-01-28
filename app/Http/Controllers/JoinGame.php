@@ -7,10 +7,8 @@ use App\GameObjects\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-class AddPlayer extends Controller
+class JoinGame extends Controller
 {
-    public const ARENA_SIZE = 25;
-
     public function __invoke(Request $request, string $id) {
         $gameState = GameState::find($id);
 

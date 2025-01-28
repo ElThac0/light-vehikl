@@ -21,16 +21,16 @@ const handleKeyPress = (e) => {
   let direction = null;
   switch (e.key) {
     case 'w':
-      direction = 'NORTH';
+      direction = 'North';
       break;
     case 'a':
-      direction = 'WEST';
+      direction = 'West';
       break;
     case 's':
-      direction = 'SOUTH';
+      direction = 'South';
       break;
     case 'd':
-      direction = 'EAST';
+      direction = 'East';
       break;
   }
 

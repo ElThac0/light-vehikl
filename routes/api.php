@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AddPlayer;
+use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\CreateGame;
 use App\Http\Controllers\GetGame;
 use App\Http\Controllers\ProfileController;

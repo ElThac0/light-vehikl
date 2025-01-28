@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AddPlayer;
+use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\CreateGame;
 use App\Http\Controllers\GameMove;
 use App\Http\Controllers\GetGame;
@@ -40,6 +40,6 @@ Route::post('/games', CreateGame::class)->name('game.create');
 Route::get('/my-game', GetGame::class)->name('game.my');
 Route::post('/game/{id}/move', GameMove::class)->name('game.move');
 
-Route::post('/player-joined/{id}', AddPlayer::class)->name('game.join');
+Route::post('/join-game/{id}', JoinGame::class)->name('game.join');
 
 require __DIR__.'/auth.php';
