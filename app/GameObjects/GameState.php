@@ -118,7 +118,7 @@ class GameState
     public static function find($id): ?GameState
     {
         $dehydrated = Octane::table('gameState')->get($id);
-        return GameState::hydrate($dehydrated, $id);
+        return $dehydrated ? GameState::hydrate($dehydrated, $id) : null;
     }
 
     public static function hydrate(array $data, string $id): GameState
