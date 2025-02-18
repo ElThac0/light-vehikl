@@ -8,6 +8,7 @@ use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Sleep;
 use Laravel\Octane\Facades\Octane;
 use Ramsey\Uuid\Uuid;
 
@@ -113,6 +114,14 @@ class GameState
             'players' => $this->playersToString(),
         ]);
         return $this;
+    }
+
+    public function run(): void
+    {
+        while(!$this->isOver()) {
+            $this->nextTick();
+            Sleep::for(500)->milliseconds();
+        }
     }
 
     public static function find($id): ?GameState
