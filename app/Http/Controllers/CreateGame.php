@@ -7,7 +7,6 @@ use App\GameObjects\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Process;
-use Laravel\Octane\Facades\Octane;
 
 class CreateGame extends Controller
 {
@@ -29,7 +28,7 @@ class CreateGame extends Controller
         $gameList[] = $gameState->getId();
         Cache::set('game_list', $gameList);
 
-        Process::forever()->run('php artisan game:start ' . $gameState->getId());
+        Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
 
         return response()->json($gameState->toArray());
     }
