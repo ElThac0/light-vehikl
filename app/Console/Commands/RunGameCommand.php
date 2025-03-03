@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\GameObjects\GameState;
 use Illuminate\Console\Command;
-use Laravel\Octane\Octane;
 
 class RunGameCommand extends Command
 {
@@ -17,9 +16,13 @@ class RunGameCommand extends Command
     public function handle(): void
     {
         $gameId = $this->argument('gameId');
-        $game = GameState::find($gameId);
+        $game = GameState::findCache($gameId);
         $this->info('Running game...');
-        \Illuminate\Support\Sleep::for(200)->milliseconds();
+        while (!$game->isOver()) {
+            $game->nextTick();
+            \Illuminate\Support\Sleep::for(200)->milliseconds();
+        }
+
         $this->info('Done.');
     }
 }

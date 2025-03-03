@@ -8,6 +8,7 @@ use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Laravel\Octane\Facades\Octane;
 use Ramsey\Uuid\Uuid;
@@ -128,6 +129,16 @@ class GameState
     {
         $dehydrated = Octane::table('gameState')->get($id);
         return $dehydrated ? GameState::hydrate($dehydrated, $id) : null;
+    }
+
+    public static function findCache($id): ?GameState
+    {
+        return Cache::get('game-' . $id);
+    }
+
+    public function saveCache(): void
+    {
+        Cache::set('game-' . $this->id, $this);
     }
 
     public static function hydrate(array $data, string $id): GameState
