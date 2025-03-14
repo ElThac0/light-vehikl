@@ -28,7 +28,7 @@ class CreateGame extends Controller
         $gameList[] = $gameState->getId();
         Cache::set('game_list', $gameList);
 
-        Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
+//        Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
 
         return response()->json($gameState->toArray());
     }

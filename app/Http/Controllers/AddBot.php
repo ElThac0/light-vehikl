@@ -2,27 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\GameObjects\Bot;
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
 use Illuminate\Http\Request;
 
-class JoinGame extends Controller
+class AddBot extends Controller
 {
     public function __invoke(Request $request, string $id) {
         $gameState = GameState::find($id);
 
-        $playerId = $request->session()->getId();
-
-        $player = new Player($playerId);
+        $bot = new Bot();
         try {
-            $gameState->addPlayer($player);
+            $gameState->addBot($bot);
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
 
         $gameState->save();
-
-        $request->session()->put('active_game', $gameState->getId());
 
         return response()->json($gameState->toArray());
     }

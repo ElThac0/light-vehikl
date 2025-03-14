@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddBot;
 use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\CreateGame;
 use App\Http\Controllers\GameMove;
@@ -40,6 +41,7 @@ Route::get('/my-game', GetGame::class)->name('game.my');
 Route::post('/game/{id}/move', GameMove::class)->name('game.move');
 
 Route::post('/join-game/{id}', JoinGame::class)->name('game.join');
+Route::post('/add-bot/{id}', AddBot::class)->name('game.add-bot');
 Route::post('/leave-game/{id}', LeaveGame::class)->name('game.leave');
 
 require __DIR__.'/auth.php';

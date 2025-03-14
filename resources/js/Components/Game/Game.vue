@@ -47,6 +47,14 @@ const createGame = async () => {
   }
 }
 
+const addBot = async () => {
+  const response = await axios.post(route('game.add-bot', { id: activeGame.value?.id }));
+
+  if (response.data?.id) {
+    setActiveGame(response.data);
+  }
+}
+
 const leaveGame = async () => {
   await axios.post(route('game.leave', { id: activeGame.value?.id }));
 
@@ -91,6 +99,7 @@ onMounted(async () => {
 <template>
   <GameList :gameList="gameList" :activeGame="activeGame" @joined-game="setActiveGame"/>
   <button @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</button>
+  <button @click="addBot" v-if="activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Bot</button>
   <button @click="leaveGame" v-if="activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Leave Game</button>
   <template v-if="activeGame">
     <h2>In Game: {{ activeGame?.id }}</h2>

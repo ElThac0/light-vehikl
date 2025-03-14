@@ -18,6 +18,8 @@ class GameState
     const MAX_PLAYERS = 4;
     public array $arena;
     public array $players = [];
+    /** @var array<Bot> $bots */
+    public array $bots = [];
     protected int $maxX, $maxY;
 
     public function __construct(protected int $arenaSize, protected $id = null)
@@ -103,7 +105,14 @@ class GameState
         $playerEnum = $start->playerType;
         $player->setSlot($playerEnum);
         $this->players[$playerEnum->value] = $player->setLocation($coords)->setDirection($start->direction);
+
         $start->tile->setContents($playerEnum);
+    }
+
+    public function addBot(Bot $bot): void
+    {
+        $this->bots[] = $bot;
+        $this->addPlayer($bot->getPlayer());
     }
 
     public function save(): self
@@ -169,6 +178,10 @@ class GameState
 
     public function nextTick(): void
     {
+        foreach($this->bots as $bot) {
+            $bot->updatePlayer();
+        }
+
         foreach($this->getPlayers() as $playerSlot => $player) {
             if ($player->getStatus() !== PlayerStatus::CRASHED) {
                 $this->movePlayer($player);
