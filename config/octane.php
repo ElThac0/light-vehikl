@@ -155,6 +155,7 @@ return [
             'arenaSize' => 'int',
             'arena' => 'string:2500',
             'players' => 'string:1000',
+            'bots' => 'string:1000',
         ],
     ],
 

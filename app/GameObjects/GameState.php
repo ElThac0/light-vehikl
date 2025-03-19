@@ -90,7 +90,7 @@ class GameState
     /**
      * @throws Exception
      */
-    public function addPlayer(Player $player): void
+    public function addPlayer(Player $player): ContentType
     {
         if (count($this->players) >= self::MAX_PLAYERS) {
             throw new Exception('Max players reached');
@@ -107,12 +107,14 @@ class GameState
         $this->players[$playerEnum->value] = $player->setLocation($coords)->setDirection($start->direction);
 
         $start->tile->setContents($playerEnum);
+
+        return $playerEnum;
     }
 
     public function addBot(Bot $bot): void
     {
-        $this->bots[] = $bot;
-        $this->addPlayer($bot->getPlayer());
+        $position = $this->addPlayer($bot->getPlayer());
+        $this->bots[$position->value] = $bot;
     }
 
     public function save(): self
@@ -122,6 +124,7 @@ class GameState
             'arenaSize' => $this->arenaSize,
             'arena' => join($this->serializeArena()),
             'players' => $this->playersToString(),
+            'bots' => json_encode(array_keys($this->bots)),
         ]);
         return $this;
     }
@@ -155,7 +158,18 @@ class GameState
         $gameState = new GameState($data['arenaSize'], $id);
         $gameState->arenaFromString($data['arena']);
         $gameState->playersFromString($data['players']);
+        $gameState->hydrateBots(json_decode($data['bots'] ?? [], true));
         return $gameState;
+    }
+
+    protected function hydrateBots(array $locations)
+    {
+        // for each key (bot location)
+            // create a bot from that player and push into bot array
+
+        foreach ($locations as $index) {
+            $this->bots[] = Bot::fromPlayer($this->players[$index]);
+        }
     }
 
     public function playersFromString(string $input): void
@@ -254,8 +268,19 @@ class GameState
     protected function deserializePlayers(array $playerArrays): array
     {
         $players = array_map(fn ($arr) => Player::deserialize($arr), $playerArrays);
+
         return array_reduce($players, function (array $carry, Player $player) {
             $carry[$player->getSlot()->value] = $player;
+            return $carry;
+        }, []);
+    }
+
+    protected function deserializeBots(array $playerArrays): array
+    {
+        $bots = array_map(fn ($arr) => Bot::deserialize($arr), $playerArrays);
+
+        return array_reduce($bots, function (array $carry, Bot $bot) {
+            $carry[] = $bot;
             return $carry;
         }, []);
     }

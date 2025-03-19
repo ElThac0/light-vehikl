@@ -11,9 +11,9 @@ class Bot
     private Player $player;
     private array $players;
 
-    public function __construct()
+    public function __construct(?Player $player = null)
     {
-        $this->player = new Player(Str::uuid()->toString());
+        $this->player = $player ?: new Player(Str::uuid()->toString());
     }
     public function readGame(array $game): void
     {
@@ -25,7 +25,7 @@ class Bot
     public function decideMove(): Direction|null
     {
         // rando!
-        return array_rand(Direction::cases());
+        return Direction::EAST;
     }
 
     public function updatePlayer(): void
@@ -44,5 +44,10 @@ class Bot
     public function getPlayer(): Player
     {
         return $this->player;
+    }
+
+    public static function fromPlayer(Player $player): self
+    {
+        return new static($player);
     }
 }
