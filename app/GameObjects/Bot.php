@@ -3,6 +3,7 @@
 namespace App\GameObjects;
 
 use App\Enums\Direction;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class Bot
@@ -24,8 +25,20 @@ class Bot
 
     public function decideMove(): Direction|null
     {
-        // rando!
-        return Direction::EAST;
+        $avoid = match ($this->player->direction) {
+            Direction::NORTH => Direction::SOUTH,
+            Direction::EAST => Direction::WEST,
+            Direction::SOUTH => Direction::NORTH,
+            Direction::WEST => Direction::EAST,
+            default => Direction::NORTH,
+        };
+
+        $directions = collect(Direction::cases())
+            ->filter(fn(Direction $direction) => $direction->value !== $avoid->value)
+            ->filter(fn(Direction $direction) => ! in_array($direction->value, $this->player->avoidDirections()))
+            ->values();
+
+        return Arr::random($directions->toArray());
     }
 
     public function updatePlayer(): void

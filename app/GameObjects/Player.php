@@ -114,4 +114,28 @@ class Player implements JsonSerializable
     {
         return $this->status === PlayerStatus::CRASHED;
     }
+
+    public function avoidDirections(): array
+    {
+        $avoid = [];
+
+        if ($this->x === 0) {
+            $avoid[] = Direction::WEST;
+        }
+
+        if ($this->y === 0) {
+            $avoid[] = Direction::NORTH;
+        }
+
+        // TODO: Remove magic number 24s
+        if ($this->x === 24) {
+            $avoid[] = Direction::EAST;
+        }
+
+        if ($this->y === 24) {
+            $avoid[] = Direction::SOUTH;
+        }
+
+        return $avoid;
+    }
 }
