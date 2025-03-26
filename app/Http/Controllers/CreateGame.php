@@ -6,6 +6,7 @@ use App\GameObjects\GameState;
 use App\GameObjects\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Process;
 
 class CreateGame extends Controller
 {
@@ -20,14 +21,13 @@ class CreateGame extends Controller
         $request->session()->put('active_game', $gameState->getId());
 
         $gameState->save();
-        $gameState->saveCache();
+
         $gameList = Cache::remember("game_list", 3600, function () {
             return [];
         });
         $gameList[] = $gameState->getId();
-        Cache::set('game_list', $gameList);
 
-//        Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
+        Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
 
         return response()->json($gameState->toArray());
     }

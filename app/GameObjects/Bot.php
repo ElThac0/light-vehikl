@@ -50,4 +50,9 @@ class Bot
     {
         return new static($player);
     }
+
+    public static function deserialize(): self
+    {
+
+    }
 }

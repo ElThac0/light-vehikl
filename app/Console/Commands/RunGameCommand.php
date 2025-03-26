@@ -17,12 +17,14 @@ class RunGameCommand extends Command
     public function handle(): void
     {
         $gameId = $this->argument('gameId');
-        $game = GameState::findCache($gameId);
+        $game = GameState::find($gameId);
         $this->info('Running game...');
 
         while (!$game->isOver()) {
             $game->nextTick();
+            $game->save();
             Sleep::for(200)->milliseconds();
+            $game = GameState::find($gameId);
         }
 
         $this->info('Done.');
