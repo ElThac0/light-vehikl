@@ -42,7 +42,7 @@ class GameStateRulesTest extends TestCase
         $gameState->addPlayer($player);
         $player->setDirection(Direction::EAST);
 
-        $nextTile = $gameState->getTile(1,0);
+        $nextTile = $gameState->arena->getTile(1,0);
         $nextTile->setContents(ContentType::WALL);
 
         $gameState->nextTick();

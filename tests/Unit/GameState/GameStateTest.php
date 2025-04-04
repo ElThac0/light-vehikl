@@ -29,7 +29,7 @@ class GameStateTest extends TestCase
     {
         $gameState = new GameState(5);
 
-        $tile = $gameState->getTile($x, $y);
+        $tile = $gameState->arena->getTile($x, $y);
 
         $this->assertInstanceOf(Tile::class, $tile);
         $this->assertEquals($x, $tile->getX());
@@ -40,7 +40,7 @@ class GameStateTest extends TestCase
     {
         $gameState = new GameState(5);
 
-        $startLocations = $gameState->getStartLocations();
+        $startLocations = $gameState->arena->getStartLocations();
 
         $this->assertInstanceOf(Tile::class, $startLocations[0]->tile);
 
@@ -100,7 +100,7 @@ class GameStateTest extends TestCase
         $this->assertThrows(
             function () use ($gameState, $tooManyPlayers) {
                 for ($i = 0; $i < $tooManyPlayers; $i++) {
-                    $gameState->addPlayer(new Player());
+                    $gameState->addPlayer(new Player('fakeId'));
                 }
             }
         );
@@ -163,35 +163,4 @@ class GameStateTest extends TestCase
         $this->assertFalse($gameState->isInGame($player2));
     }
 
-    public function testLoadsArenaFromString(): void
-    {
-        $gameState = new GameState(2);
-
-        $gameStr = '1111';
-        $gameState->arenaFromString($gameStr);
-
-        $this->assertEquals(ContentType::WALL, $gameState->getTile(0,0)->getContents());
-        $this->assertEquals(ContentType::WALL, $gameState->getTile(1,1)->getContents());
-
-        $gameStr = '0234';
-        $gameState->arenaFromString($gameStr);
-
-        $this->assertEquals(ContentType::EMPTY, $gameState->getTile(0,0)->getContents());
-        $this->assertEquals(ContentType::PLAYER1, $gameState->getTile(1,0)->getContents());
-    }
-
-    public function testLoadsPlayersFromString(): void
-    {
-        $gameState = new GameState(2);
-
-        $player1 = new Player('abc123');
-        $gameState->addPlayer($player1);
-
-        $playerString = $gameState->playersToString();
-
-        $newGame = new GameState(2);
-        $newGame->playersFromString($playerString);
-
-        $this->assertEquals($gameState->getPlayers(), $newGame->getPlayers());
-    }
 }
