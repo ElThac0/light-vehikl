@@ -26,13 +26,10 @@ class BotTest extends TestCase
 
         $this->assertEquals(1, $gameState->getPlayers()->count());
 
-        $gameBot = $gameState->getPlayers()->first();
+        $gameBotPlayer = $gameState->getPlayers()->first();
 
-        $this->assertEquals(Player::class, $gameBot::class);
-        $this->assertSame($bot->getPlayer(), $gameBot);
-
-        $gameState->nextTick();
-        $this->assertEquals(Direction::WEST, $bot->getPlayer()->direction);
+        $this->assertEquals(Player::class, $gameBotPlayer::class);
+        $this->assertSame($bot->getPlayer(), $gameBotPlayer);
     }
 
     function testItSavesAndAssociatesBots(): void

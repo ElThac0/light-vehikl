@@ -23,7 +23,7 @@ class RunGameCommand extends Command
         while (!$game->isOver()) {
             $game->nextTick();
             $game->save();
-            Sleep::for(200)->milliseconds();
+            Sleep::for(1000)->milliseconds();
             $game = GameState::find($gameId);
         }
 

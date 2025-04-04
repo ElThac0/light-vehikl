@@ -101,6 +101,7 @@ class GameState
     public function nextTick(): void
     {
         foreach($this->bots as $bot) {
+            $bot->arena = $this->arena;
             $bot->updatePlayer();
         }
 

@@ -3,42 +3,26 @@
 namespace App\GameObjects;
 
 use App\Enums\Direction;
-use Illuminate\Support\Arr;
+use App\GameObjects\Personalities\KeepLane;
+use App\GameObjects\Personalities\Personality;
 use Illuminate\Support\Str;
 
 class Bot
 {
-    private Arena $arena;
+    public Arena $arena;
     private Player $player;
-    private array $players;
 
-    public function __construct(?Player $player = null)
+    private Personality $personality;
+
+    public function __construct(?Player $player = null, ?Personality $personality = null)
     {
         $this->player = $player ?: new Player(Str::uuid()->toString());
-    }
-    public function readGame(array $game): void
-    {
-        $this->players = $game['players'];
-        $this->arena = new Arena($game['arenaSize'], $game['tiles']);
-        $this->playerId = Str::uuid();
+        $this->personality = $personality ?: new KeepLane($this->player);
     }
 
     public function decideMove(): Direction|null
     {
-        $avoid = match ($this->player->direction) {
-            Direction::NORTH => Direction::SOUTH,
-            Direction::EAST => Direction::WEST,
-            Direction::SOUTH => Direction::NORTH,
-            Direction::WEST => Direction::EAST,
-            default => Direction::NORTH,
-        };
-
-        $directions = collect(Direction::cases())
-            ->filter(fn(Direction $direction) => $direction->value !== $avoid->value)
-            ->filter(fn(Direction $direction) => ! in_array($direction->value, $this->player->avoidDirections()))
-            ->values();
-
-        return Arr::random($directions->toArray());
+        return $this->personality->decideMove($this->arena);
     }
 
     public function updatePlayer(): void
