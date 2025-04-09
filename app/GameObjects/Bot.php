@@ -33,11 +33,6 @@ class Bot
         }
     }
 
-    public function getPlayerId(): string
-    {
-        return $this->player->getId();
-    }
-
     public function getPlayer(): Player
     {
         return $this->player;

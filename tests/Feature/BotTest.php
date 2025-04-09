@@ -50,6 +50,6 @@ class BotTest extends TestCase
         $restored = GameState::find($id);
 
         $this->assertEquals(1, $gameState->getPlayers()->count());
-        $this->assertSame($bot->getPlayer(), $gameState->getPlayers()->first());
+        $this->assertSame($bot->getPlayer(), $restored->getPlayers()->first());
     }
 }
