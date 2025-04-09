@@ -14,10 +14,10 @@ class Bot
 
     private Personality $personality;
 
-    public function __construct(?Player $player = null, ?Personality $personality = null)
+    public function __construct(?Player $player = null, $personality = null)
     {
         $this->player = $player ?: new Player(Str::uuid()->toString());
-        $this->personality = $personality ?: new KeepLane($this->player);
+        $this->personality = $personality ? new $personality($this->player) : new KeepLane($this->player);
     }
 
     public function decideMove(): Direction|null

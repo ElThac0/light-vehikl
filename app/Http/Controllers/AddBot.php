@@ -4,14 +4,24 @@ namespace App\Http\Controllers;
 
 use App\GameObjects\Bot;
 use App\GameObjects\GameState;
+use App\GameObjects\Personalities\ChangeDirection;
+use App\GameObjects\Personalities\KeepLane;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AddBot extends Controller
 {
     public function __invoke(Request $request, string $id) {
         $gameState = GameState::find($id);
 
-        $bot = new Bot();
+        $knownPersonalities = [
+            KeepLane::class,
+            ChangeDirection::class,
+        ];
+
+        $personality = Arr::random($knownPersonalities);
+
+        $bot = new Bot(null, $personality);
         try {
             $gameState->addBot($bot);
         } catch (\Exception $e) {
