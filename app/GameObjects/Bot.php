@@ -3,6 +3,7 @@
 namespace App\GameObjects;
 
 use App\Enums\Direction;
+use App\Enums\PersonalityType;
 use App\GameObjects\Personalities\KeepLane;
 use App\GameObjects\Personalities\Personality;
 use Illuminate\Support\Str;
@@ -14,10 +15,10 @@ class Bot
 
     private Personality $personality;
 
-    public function __construct(?Player $player = null, $personality = null)
+    public function __construct(?Player $player = null, PersonalityType $personality = null)
     {
         $this->player = $player ?: new Player(Str::uuid()->toString());
-        $this->personality = $personality ? new $personality($this->player) : new KeepLane($this->player);
+        $this->personality = $personality ? new $personality->value($this->player) : new KeepLane($this->player);
     }
 
     public function decideMove(): Direction|null

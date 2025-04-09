@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PersonalityType;
 use App\GameObjects\Bot;
 use App\GameObjects\GameState;
 use App\GameObjects\Personalities\ChangeDirection;
@@ -14,10 +15,7 @@ class AddBot extends Controller
     public function __invoke(Request $request, string $id) {
         $gameState = GameState::find($id);
 
-        $knownPersonalities = [
-            KeepLane::class,
-            ChangeDirection::class,
-        ];
+        $knownPersonalities = PersonalityType::cases();
 
         $personality = Arr::random($knownPersonalities);
 
