@@ -22,12 +22,11 @@ class CreateGame extends Controller
 
         $gameState->save();
 
-        $gameList = Cache::remember("game_list", 3600, function () {
+        $gameList = cache()->remember("game_list", 3600, function () {
             return [];
         });
         $gameList[] = $gameState->getId();
-
-        Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
+        cache()->put('game_list', $gameList);
 
         return response()->json($gameState->toArray());
     }
