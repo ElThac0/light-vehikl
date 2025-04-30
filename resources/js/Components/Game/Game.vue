@@ -65,7 +65,11 @@ const leaveGame = async () => {
 }
 
 const startGame = async () => {
-  await axios.post(route('game.start', { id: activeGame.value?.id }));
+  try {
+    await axios.post(route('game.start', {id: activeGame.value?.id}));
+  } catch (e) {
+    alert(`Error starting game - ${e.response?.data}`)
+  }
 }
 
 const setActiveGame = (gameState) => {

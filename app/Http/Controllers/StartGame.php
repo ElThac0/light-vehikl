@@ -12,6 +12,11 @@ class StartGame extends Controller
     {
         $gameState = GameState::find($id);
 
+
+        if ($gameState->getPlayers()->count() < 2) {
+            return response()->json('Not enough players', 500);
+        }
+
         Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
 
         return response()->json($gameState->toArray());
