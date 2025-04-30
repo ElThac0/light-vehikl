@@ -53,6 +53,24 @@ class GameState
         return $this->getPlayers()->first(fn (Player $player) => $player->getId() === $playerId);
     }
 
+    /** @throws Exception */
+    public function setReady(string $playerId): self
+    {
+        $player = $this->findPlayer($playerId);
+
+        if ($player === null) {
+            throw new Exception('Player not found');
+        }
+
+        if ($player->status !== PlayerStatus::WAITING) {
+            throw new Exception('Player not ready to be ready');
+        }
+
+        $player->setStatus(PlayerStatus::READY);
+
+        return $this;
+    }
+
     public function getPlayer(ContentType $playerType): Player
     {
         return $this->players[$playerType->value];

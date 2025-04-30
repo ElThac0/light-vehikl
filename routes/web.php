@@ -6,6 +6,7 @@ use App\Http\Controllers\CreateGame;
 use App\Http\Controllers\GameMove;
 use App\Http\Controllers\GetGame;
 use App\Http\Controllers\LeaveGame;
+use App\Http\Controllers\MarkReady;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StartGame;
 use Illuminate\Foundation\Application;
@@ -45,5 +46,6 @@ Route::post('/game/{id}/move', GameMove::class)->name('game.move');
 Route::post('/join-game/{id}', JoinGame::class)->name('game.join');
 Route::post('/add-bot/{id}', AddBot::class)->name('game.add-bot');
 Route::post('/leave-game/{id}', LeaveGame::class)->name('game.leave');
+Route::post('/mark-ready/{id}', MarkReady::class)->name('game.mark-ready');
 
 require __DIR__.'/auth.php';

@@ -72,6 +72,15 @@ const startGame = async () => {
   }
 }
 
+const markReady = async () => {
+  try {
+    const response = await axios.post(route('game.mark-ready', {id: activeGame.value.id}));
+  } catch (e) {
+    console.log('oops', e)
+    alert(`Marking ready failed - ${e.response?.data}`);
+  }
+};
+
 const setActiveGame = (gameState) => {
   activeGame.value = gameState;
 
@@ -111,6 +120,7 @@ onMounted(async () => {
   <PrimaryButton @click="addBot" v-if="activeGame">Add Bot</PrimaryButton>
   <PrimaryButton @click="leaveGame" v-if="activeGame">Leave Game</PrimaryButton>
   <PrimaryButton @click="startGame" v-if="activeGame">Start Game</PrimaryButton>
+  <PrimaryButton @click="markReady" v-if="activeGame">Mark Ready</PrimaryButton>
   <template v-if="activeGame">
     <h2>In Game: {{ activeGame?.id }}</h2>
     <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
