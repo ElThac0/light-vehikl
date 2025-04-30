@@ -7,6 +7,7 @@ use App\Http\Controllers\GameMove;
 use App\Http\Controllers\GetGame;
 use App\Http\Controllers\LeaveGame;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StartGame;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/games', CreateGame::class)->name('game.create');
+Route::post('/game/{id}/start', StartGame::class)->name('game.start');
 Route::get('/my-game', GetGame::class)->name('game.my');
 Route::post('/game/{id}/move', GameMove::class)->name('game.move');
 

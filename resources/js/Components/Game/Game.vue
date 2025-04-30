@@ -2,6 +2,7 @@
 import Tile from './Tile.vue'
 import {onMounted, ref, computed, watch} from "vue";
 import GameList from "@/Components/Game/GameList.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
   sessionId: String,
@@ -63,6 +64,10 @@ const leaveGame = async () => {
   setActiveGame(null);
 }
 
+const startGame = async () => {
+  await axios.post(route('game.start', { id: activeGame.value?.id }));
+}
+
 const setActiveGame = (gameState) => {
   activeGame.value = gameState;
 
@@ -98,9 +103,10 @@ onMounted(async () => {
 
 <template>
   <GameList :gameList="gameList" :activeGame="activeGame" @joined-game="setActiveGame"/>
-  <button @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</button>
-  <button @click="addBot" v-if="activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Bot</button>
-  <button @click="leaveGame" v-if="activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Leave Game</button>
+  <PrimaryButton @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
+  <PrimaryButton @click="addBot" v-if="activeGame">Add Bot</PrimaryButton>
+  <PrimaryButton @click="leaveGame" v-if="activeGame">Leave Game</PrimaryButton>
+  <PrimaryButton @click="startGame" v-if="activeGame">Start Game</PrimaryButton>
   <template v-if="activeGame">
     <h2>In Game: {{ activeGame?.id }}</h2>
     <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">

@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Process;
 
 class StartGame extends Controller
 {
-    public function __invoke(Request $request, $gameId)
+    public function __invoke(Request $request, $id)
     {
-        $gameState = GameState::find($gameId);
+        $gameState = GameState::find($id);
 
         Process::path(base_path())->start('php artisan run:game ' . $gameState->getId());
 
