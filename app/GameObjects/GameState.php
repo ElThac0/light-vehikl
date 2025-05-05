@@ -114,7 +114,7 @@ class GameState
      */
     public function addBot(Bot $bot): void
     {
-        $position = $this->addPlayer($bot->getPlayer());
+        $position = $this->addPlayer($bot->getPlayer()->setStatus(PlayerStatus::READY));
         $this->bots[$position->value] = $bot;
     }
 
