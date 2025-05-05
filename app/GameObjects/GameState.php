@@ -68,6 +68,8 @@ class GameState
 
         $player->setStatus(PlayerStatus::READY);
 
+        GameUpdated::dispatch($this);
+
         return $this;
     }
 

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Process;
 
 class CreateGame extends Controller
 {
-    public const ARENA_SIZE = 25;
+    public const ARENA_SIZE = 50;
 
     public function __invoke(Request $request)
     {
