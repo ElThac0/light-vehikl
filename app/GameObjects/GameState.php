@@ -4,6 +4,7 @@ namespace App\GameObjects;
 
 use App\Enums\ContentType;
 use App\Enums\Direction;
+use App\Enums\GameStatus;
 use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use App\Traits\PersistInCache;
@@ -24,6 +25,7 @@ class GameState
     /** @var array<Bot> $bots */
     protected array $bots = [];
     protected int $maxX, $maxY;
+    protected GameStatus $status = GameStatus::WAITING;
 
     public function __construct(protected int $arenaSize, $id = null)
     {
@@ -174,6 +176,7 @@ class GameState
             'arenaSize' => $this->arenaSize,
             'tiles' => $this->arena->serialize(),
             'players' => $this->serializePlayers(),
+            'status' => $this->status,
         ];
     }
 
@@ -190,5 +193,11 @@ class GameState
     public function isOver(): bool
     {
         return $this->getPlayers()->every(fn (Player $player) => $player->crashed());
+    }
+
+    public function setStatus(GameStatus $status): self
+    {
+        $this->status = $status;
+        return $this;
     }
 }

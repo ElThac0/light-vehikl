@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\GameStatus;
 use App\GameObjects\GameState;
 use Illuminate\Console\Command;
 use Illuminate\Support\Sleep;
@@ -18,6 +19,7 @@ class RunGameCommand extends Command
     {
         $gameId = $this->argument('gameId');
         $game = GameState::find($gameId);
+        $game->setStatus(GameStatus::ACTIVE);
         $this->info('Running game...');
 
         while (!$game->isOver()) {
