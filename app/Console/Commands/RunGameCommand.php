@@ -6,6 +6,8 @@ use App\Enums\GameStatus;
 use App\GameObjects\GameState;
 use Illuminate\Console\Command;
 use Illuminate\Support\Sleep;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class RunGameCommand extends Command
 {
@@ -25,9 +27,18 @@ class RunGameCommand extends Command
         while (!$game->isOver()) {
             $game->nextTick();
             $game->save();
-            Sleep::for(1000)->milliseconds();
+            Sleep::for(200)->milliseconds();
             $game = GameState::find($gameId);
         }
+
+        try {
+            $gameList = cache()->get('game_list');
+            $gameList = array_diff($gameList, [$gameId]);
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            $gameList = [];
+        }
+
+        cache()->put('game_list', $gameList);
 
         $this->info('Done.');
     }
