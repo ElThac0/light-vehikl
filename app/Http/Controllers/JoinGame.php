@@ -13,6 +13,10 @@ class JoinGame extends Controller
 
         $playerId = $request->session()->getId();
 
+        if ($gameState->findPlayer($playerId)) {
+            return response()->json($gameState->toArray());
+        }
+
         $player = new Player($playerId);
         try {
             $gameState->addPlayer($player);
