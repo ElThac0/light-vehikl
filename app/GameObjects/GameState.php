@@ -50,7 +50,7 @@ class GameState
         return collect($this->players);
     }
 
-    public function findPlayer(string $playerId): Player
+    public function findPlayer(string $playerId): ?Player
     {
         return $this->getPlayers()->first(fn (Player $player) => $player->getId() === $playerId);
     }
@@ -105,6 +105,8 @@ class GameState
         $this->players[$playerEnum->value] = $player->setLocation($coords)->setDirection($start->direction);
 
         $start->tile->setContents($playerEnum);
+
+        GameUpdated::dispatch($this);
 
         return $playerEnum;
     }
