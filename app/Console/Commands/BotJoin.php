@@ -2,13 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\GameStatus;
-use App\GameObjects\GameState;
+use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Sleep;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class BotJoin extends Command
 {
@@ -17,21 +13,27 @@ class BotJoin extends Command
     protected $description = 'Command description';
 
     protected string $host = 'http://localhost:8000';
+    protected string $gameId;
 
-    protected array $cookies;
+    protected CookieJar $cookies;
     public function handle(): void
     {
-        $gameId = $this->argument('gameId');
+        $this->gameId = $this->argument('gameId');
 
-        $this->joinGame($gameId);
+        $this->joinGame($this->gameId);
+        $this->setReady();
     }
 
-    protected function joinGame(string $gameId): string
+    protected function joinGame(string $gameId): void
     {
-        $response = Http::post($this->host . '/join-game/' . $gameId)->json();
+        $response = Http::post($this->host . '/join-game/' . $gameId);
+//        dd($response);
+        $this->cookies = $response->cookies;
+    }
 
-        $this->cookies = $response->getCookies();
-
-        return 'ok';
+    protected function setReady(): void
+    {
+        $response = Http::post($this->host . '/mark-ready/' . $this->gameId);
+        dump($response);
     }
 }
