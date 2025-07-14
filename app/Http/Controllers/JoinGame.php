@@ -22,6 +22,7 @@ class JoinGame extends Controller
         }
 
         $player = new Player($playerId);
+
         try {
             $gameState->addPlayer($player);
         } catch (\Exception $e) {

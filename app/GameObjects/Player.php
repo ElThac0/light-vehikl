@@ -92,7 +92,7 @@ class Player implements JsonSerializable
         return [
             'status' => $this->status->value,
             'id' => $this->id,
-            'direction' => $this->direction->value,
+            'direction' => $this->direction?->value,
             'slot' => $this->slot,
             'x' => $this->x,
             'y' => $this->y,
