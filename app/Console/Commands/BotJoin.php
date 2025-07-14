@@ -32,7 +32,15 @@ class BotJoin extends Command
 
     protected function joinGame(string $gameId): void
     {
-        $this->client()->post($this->host . '/join-game/' . $gameId);
+        $response = $this->client()->post($this->host . '/join-game/' . $gameId);
+
+        if (!$response->successful()) {
+            $this->error('Failed to join: ' . $response->body());
+            return;
+        }
+
+        $this->playerId = $response->json('yourId');
+        $this->line('Joined as player: <info>' . $this->playerId . '</info>');
     }
 
     protected function setReady(): void

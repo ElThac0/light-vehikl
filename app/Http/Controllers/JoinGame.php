@@ -33,6 +33,6 @@ class JoinGame extends Controller
 
         $request->session()->put('active_game', $gameState->getId());
 
-        return response()->json($gameState->toArray());
+        return response()->json(['gameState' => $gameState->toArray(), 'yourId' => $player->id]);
     }
 }
