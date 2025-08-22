@@ -6,6 +6,7 @@ use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Console\Command;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use WebSocket\Client as WSClient;
 
 class BotJoin extends Command
 {
@@ -18,15 +19,18 @@ class BotJoin extends Command
     protected string $playerId;
     protected CookieJar $cookies;
 
-    protected $client;
+    protected $webClient;
+
+    protected WSClient $ws;
 
     public function handle(): void
     {
-        $this->gameId = $this->argument('gameId');
-
-        $this->client = Http::buildClient();
-
-        $this->joinGame($this->gameId);
+//        $this->gameId = $this->argument('gameId');
+//
+//        $this->webClient = Http::buildClient();
+//
+//        $this->joinGame($this->gameId);
+        $this->connectWebsocket();
         $this->setReady();
     }
 
@@ -50,6 +54,22 @@ class BotJoin extends Command
 
     protected function client(): PendingRequest
     {
-        return Http::setClient($this->client);
+        return Http::setClient($this->webClient);
+    }
+
+    protected function connectWebsocket(): void
+    {
+        $this->ws = new WSClient('ws://localhost:8080');
+        $this->ws
+            // Add standard middlewares
+            ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
+            ->addMiddleware(new \WebSocket\Middleware\PingResponder());
+
+        $this->ws->onText(function (WSClient $client, \WebSocket\Connection $connection, \WebSocket\Message\Message $message) {
+            // Act on incoming message
+            echo "Got message: {$message->getContent()} \n";
+            // Possibly respond to server
+            $client->text('I got your your message');
+        })->start();
     }
 }
