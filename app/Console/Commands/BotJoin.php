@@ -16,6 +16,7 @@ class BotJoin extends Command
 
     protected string $host = 'http://localhost:8000';
     protected string $gameId;
+    protected array $gameState;
     protected string $playerId;
     protected CookieJar $cookies;
 
@@ -25,13 +26,15 @@ class BotJoin extends Command
 
     public function handle(): void
     {
-//        $this->gameId = $this->argument('gameId');
-//
-//        $this->webClient = Http::buildClient();
-//
-//        $this->joinGame($this->gameId);
+        $this->gameId = $this->argument('gameId');
+
+        $this->webClient = Http::buildClient();
+
+        $this->joinGame($this->gameId);
         $this->connectWebsocket();
         $this->setReady();
+
+        $this->listenForUpdates();
     }
 
     protected function joinGame(string $gameId): void
@@ -44,6 +47,7 @@ class BotJoin extends Command
         }
 
         $this->playerId = $response->json('yourId');
+        $this->gameState = $response->json('gameState');
         $this->line('Joined as player: <info>' . $this->playerId . '</info>');
     }
 
@@ -59,17 +63,20 @@ class BotJoin extends Command
 
     protected function connectWebsocket(): void
     {
-        $this->ws = new WSClient('ws://localhost:8080');
+        $this->ws = new WSClient('ws://localhost:8080/app/wjfen0ggyfrmkspsekrt');
         $this->ws
             // Add standard middlewares
             ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
-            ->addMiddleware(new \WebSocket\Middleware\PingResponder());
+            ->addMiddleware(new \WebSocket\Middleware\FollowRedirect());
 
+        // Must send subscribe to channel message here.
+    }
+
+    protected function listenForUpdates(): void
+    {
         $this->ws->onText(function (WSClient $client, \WebSocket\Connection $connection, \WebSocket\Message\Message $message) {
             // Act on incoming message
             echo "Got message: {$message->getContent()} \n";
-            // Possibly respond to server
-            $client->text('I got your your message');
         })->start();
     }
 }
