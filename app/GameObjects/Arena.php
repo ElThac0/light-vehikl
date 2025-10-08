@@ -12,13 +12,13 @@ class Arena
 
     public function __construct(protected int $arenaSize, protected ?array $state = null)
     {
+        $this->maxX = $this->maxY = $this->arenaSize - 1;
         if ($state === null) {
             for ($y = 0; $y < $this->arenaSize; $y++) {
                 for ($x = 0; $x < $this->arenaSize; $x++) {
                     $this->arena[] = new Tile($x, $y);
                 }
             }
-            $this->maxX = $this->maxY = $this->arenaSize - 1;
         } else {
             $this->deserialize($state);
         }

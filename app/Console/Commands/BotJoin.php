@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\GameObjects\Arena;
+use App\GameObjects\Personalities\KeepLane;
+use App\GameObjects\Player;
 use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Console\Command;
 use Illuminate\Http\Client\PendingRequest;
@@ -12,9 +15,10 @@ class BotJoin extends Command
 {
     protected $signature = 'bot:join {gameId}';
 
-    protected $description = 'Command description';
+    protected $description = 'Add a bot to a game.';
 
     protected string $host = 'http://localhost:8000';
+    protected string $webSocketHost = 'ws://localhost:8080/app/';
     protected string $gameId;
     protected array $gameState;
     protected string $playerId;
@@ -63,20 +67,66 @@ class BotJoin extends Command
 
     protected function connectWebsocket(): void
     {
-        $this->ws = new WSClient('ws://localhost:8080/app/wjfen0ggyfrmkspsekrt');
+        $key = config('reverb.apps.apps.0.key');
+        $this->line('Connecting to websocket with key ' . $key);
+        $this->ws = new WSClient($this->webSocketHost . $key . '?protocol=7');
         $this->ws
             // Add standard middlewares
             ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
             ->addMiddleware(new \WebSocket\Middleware\FollowRedirect());
 
-        // Must send subscribe to channel message here.
+        $this->line('any messages?');
+        dump($this->ws->receive());
+
+        $channelName = "GameChannel-{$this->gameId}";
+
+        $subscribePayload = [
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'auth' => 'asdf',
+                'channel' => $channelName,
+            ]
+        ];
+
+        $this->line("Subscribing to <info>{$channelName}</info>");
+        $this->ws->text(json_encode($subscribePayload));
+        dump($this->ws->receive());
+
+//        // Must send subscribe to channel message here.
+//        $message = new MyMessage(json_encode());
+//        $this->ws->send($message);
     }
 
     protected function listenForUpdates(): void
     {
         $this->ws->onText(function (WSClient $client, \WebSocket\Connection $connection, \WebSocket\Message\Message $message) {
+            // parse the message to determine game state
+            $content = json_decode($message->getContent());
+            $data = json_decode($content->data, true);
+            dump('$content received', $content);
+            $arena = new Arena($data['arenaSize'], $data['tiles']);
+
+            $playerData = collect($data['players'])->first(fn(array $player) => $player['id'] === $this->playerId);
+            $player = Player::deserialize($playerData);
+            $personality = new KeepLane($player);
+            $move = $personality->decideMove($arena);
+            if ($move) {
+                $this->client()->post($this->host . "/game/{$this->gameId}/move", ['direction' => $move->value]);
+                dump('Moved up to <info>' . $move->value . '</info>');
+            } else {
+                dump('no move');
+            }
+
+            // send a move we want to make
+
             // Act on incoming message
-            echo "Got message: {$message->getContent()} \n";
+//            echo "Made arena: {$arena} \n";
+//            dump('arena', $arena);
         })->start();
     }
+}
+
+class MyMessage extends \WebSocket\Message\Message
+{
+
 }
