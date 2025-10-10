@@ -26,6 +26,7 @@ class GameState
     protected array $bots = [];
     protected int $maxX, $maxY;
     protected GameStatus $status = GameStatus::WAITING;
+    protected int $tick = 0;
 
     public function __construct(protected int $arenaSize, $id = null)
     {
@@ -134,6 +135,11 @@ class GameState
                 $this->movePlayer($player);
             }
         }
+        $this->tick++;
+        if ($this->isOver()) {
+            $this->status = GameStatus::COMPLETE;
+        }
+
         GameUpdated::dispatch($this);
     }
 
@@ -179,6 +185,7 @@ class GameState
             'tiles' => $this->arena->serialize(),
             'players' => $this->serializePlayers(),
             'status' => $this->status,
+            'tick' => $this->tick,
         ];
     }
 

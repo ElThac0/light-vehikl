@@ -90,11 +90,6 @@ class BotJoin extends Command
 
         $this->line("Subscribing to <info>{$channelName}</info>");
         $this->ws->text(json_encode($subscribePayload));
-        dump($this->ws->receive());
-
-//        // Must send subscribe to channel message here.
-//        $message = new MyMessage(json_encode());
-//        $this->ws->send($message);
     }
 
     protected function listenForUpdates(): void
@@ -102,9 +97,15 @@ class BotJoin extends Command
         $this->ws->onText(function (WSClient $client, \WebSocket\Connection $connection, \WebSocket\Message\Message $message) {
             // parse the message to determine game state
             $content = json_decode($message->getContent());
+            $this->handleUpdate($content);
+        })->start();
+    }
+
+    private function handleUpdate($content) {
+        if ($content->event === 'game.updated') {
             $data = json_decode($content->data, true);
-            dump('$content received', $content);
             $arena = new Arena($data['arenaSize'], $data['tiles']);
+            $tick = $data['tick'];
 
             $playerData = collect($data['players'])->first(fn(array $player) => $player['id'] === $this->playerId);
             $player = Player::deserialize($playerData);
@@ -112,21 +113,12 @@ class BotJoin extends Command
             $move = $personality->decideMove($arena);
             if ($move) {
                 $this->client()->post($this->host . "/game/{$this->gameId}/move", ['direction' => $move->value]);
-                dump('Moved up to <info>' . $move->value . '</info>');
+                $this->info("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
             } else {
-                dump('no move');
+                $this->info("[{$tick}:{$data['status']}] No move.");
             }
-
-            // send a move we want to make
-
-            // Act on incoming message
-//            echo "Made arena: {$arena} \n";
-//            dump('arena', $arena);
-        })->start();
+        } else {
+            $this->error('unknown event: ' . $content->event);
+        }
     }
-}
-
-class MyMessage extends \WebSocket\Message\Message
-{
-
 }
