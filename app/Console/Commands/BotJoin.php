@@ -32,7 +32,7 @@ class BotJoin extends Command
     {
         $this->gameId = $this->argument('gameId');
 
-        $this->webClient = Http::buildClient();
+        $this->webClient = Http::setClient(Http::buildClient());
 
         $this->joinGame($this->gameId);
         $this->connectWebsocket();
@@ -43,7 +43,7 @@ class BotJoin extends Command
 
     protected function joinGame(string $gameId): void
     {
-        $response = $this->client()->post($this->host . '/join-game/' . $gameId);
+        $response = $this->webClient->post($this->host . '/join-game/' . $gameId);
 
         if (!$response->successful()) {
             $this->error('Failed to join: ' . $response->body());
@@ -57,12 +57,7 @@ class BotJoin extends Command
 
     protected function setReady(): void
     {
-        $this->client()->post($this->host . '/mark-ready/' . $this->gameId);
-    }
-
-    protected function client(): PendingRequest
-    {
-        return Http::setClient($this->webClient);
+        $this->webClient->post($this->host . '/mark-ready/' . $this->gameId);
     }
 
     protected function connectWebsocket(): void
@@ -92,30 +87,34 @@ class BotJoin extends Command
     protected function listenForUpdates(): void
     {
         $this->ws->onText(function (WSClient $client, \WebSocket\Connection $connection, \WebSocket\Message\Message $message) {
-            // parse the message to determine game state
             $content = json_decode($message->getContent());
-            $this->handleUpdate($content);
+            $this->parseUpdate($content);
         })->start();
     }
 
-    private function handleUpdate($content): void {
-        if ($content->event === 'game.updated') {
-            $data = json_decode($content->data, true);
-            $arena = new Arena($data['arenaSize'], $data['tiles']);
-            $tick = $data['tick'];
+    private function parseUpdate($content): void {
+        switch ($content->event) {
+            case 'game.updated':
+                $this->handleGameUpdate(json_decode($content->data, true));
+                break;
+            default:
+                $this->error('unknown event: ' . $content->event);
+        }
+    }
 
-            $playerData = collect($data['players'])->first(fn(array $player) => $player['id'] === $this->playerId);
-            $player = Player::deserialize($playerData);
-            $personality = new KeepLane($player);
-            $move = $personality->decideMove($arena);
-            if ($move) {
-                $this->client()->post($this->host . "/game/{$this->gameId}/move", ['direction' => $move->value]);
-                $this->info("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
-            } else {
-                $this->info("[{$tick}:{$data['status']}] No move.");
-            }
+    private function handleGameUpdate($data): void {
+        $arena = new Arena($data['arenaSize'], $data['tiles']);
+        $tick = $data['tick'];
+
+        $playerData = collect($data['players'])->first(fn(array $player) => $player['id'] === $this->playerId);
+        $player = Player::deserialize($playerData);
+        $personality = new KeepLane($player);
+        $move = $personality->decideMove($arena);
+        if ($move) {
+            $this->webClient->post($this->host . "/game/{$this->gameId}/move", ['direction' => $move->value]);
+            $this->info("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
         } else {
-            $this->error('unknown event: ' . $content->event);
+            $this->info("[{$tick}:{$data['status']}] No move.");
         }
     }
 }
