@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\GameObjects\GameState;
 use App\GameObjects\Player;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class JoinGame extends Controller
 {
@@ -12,13 +13,21 @@ class JoinGame extends Controller
         $gameState = GameState::find($id);
 
         if (!$gameState) {
-            return response()->json('Game not found', 404);
+            return response()->json('Game not found', Response::HTTP_NOT_FOUND);
         }
 
         $playerId = $request->session()->getId();
 
         if ($gameState->findPlayer($playerId)) {
             return response()->json($gameState->toArray());
+        }
+
+        if ($gameState->isOver()) {
+            return response()->json('Game is over', Response::HTTP_GONE);
+        }
+
+        if ($gameState->isActive()) {
+            return response()->json('Game already started', Response::HTTP_FORBIDDEN);
         }
 
         $player = new Player($playerId);

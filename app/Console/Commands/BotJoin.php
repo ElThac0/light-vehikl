@@ -75,9 +75,6 @@ class BotJoin extends Command
             ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
             ->addMiddleware(new \WebSocket\Middleware\FollowRedirect());
 
-        $this->line('any messages?');
-        dump($this->ws->receive());
-
         $channelName = "GameChannel-{$this->gameId}";
 
         $subscribePayload = [
@@ -101,7 +98,7 @@ class BotJoin extends Command
         })->start();
     }
 
-    private function handleUpdate($content) {
+    private function handleUpdate($content): void {
         if ($content->event === 'game.updated') {
             $data = json_decode($content->data, true);
             $arena = new Arena($data['arenaSize'], $data['tiles']);

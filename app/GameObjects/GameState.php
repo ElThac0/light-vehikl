@@ -10,7 +10,6 @@ use App\Events\GameUpdated;
 use App\Traits\PersistInCache;
 use Exception;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Sleep;
 use Ramsey\Uuid\Uuid;
 
 class GameState
@@ -136,8 +135,8 @@ class GameState
             }
         }
         $this->tick++;
-        if ($this->isOver()) {
-            $this->status = GameStatus::COMPLETE;
+        if ($this->shouldEnd()) {
+            $this->setStatus(GameStatus::COMPLETE);
         }
 
         GameUpdated::dispatch($this);
@@ -199,9 +198,19 @@ class GameState
         return false;
     }
 
-    public function isOver(): bool
+    public function shouldEnd(): bool
     {
         return $this->getPlayers()->every(fn (Player $player) => $player->crashed());
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === GameStatus::ACTIVE;
+    }
+
+    public function isOver(): bool
+    {
+        return $this->status === GameStatus::COMPLETE;
     }
 
     public function setStatus(GameStatus $status): self
