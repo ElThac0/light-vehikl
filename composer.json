@@ -13,7 +13,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "phrity/websocket": "^3.5",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "vehikl/lvobjects": "dev-main"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -54,6 +55,12 @@
             "@php artisan migrate --graceful --ansi"
         ]
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../light-vehikl-objects"
+        }
+    ],
     "extra": {
         "laravel": {
             "dont-discover": []

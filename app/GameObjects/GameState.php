@@ -2,15 +2,16 @@
 
 namespace App\GameObjects;
 
-use App\Enums\ContentType;
-use App\Enums\Direction;
-use App\Enums\GameStatus;
-use App\Enums\PlayerStatus;
+use Vehikl\LvObjects\Enums\ContentType;
+use Vehikl\LvObjects\Enums\Direction;
+use Vehikl\LvObjects\Enums\GameStatus;
+use Vehikl\LvObjects\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use App\Traits\PersistInCache;
 use Exception;
 use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
+use Vehikl\LvObjects\GameObjects\Arena;
 
 class GameState
 {
