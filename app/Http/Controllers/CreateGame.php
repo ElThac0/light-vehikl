@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Process;
+use Vehikl\LvObjects\GameObjects\Player;
 
 class CreateGame extends Controller
 {

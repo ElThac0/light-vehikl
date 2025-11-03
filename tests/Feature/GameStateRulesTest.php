@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Enums\ContentType;
-use App\Enums\Direction;
-use App\Enums\PlayerStatus;
+use Vehikl\LvObjects\Enums\ContentType;
+use Vehikl\LvObjects\Enums\Direction;
+use Vehikl\LvObjects\Enums\PlayerStatus;
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use Vehikl\LvObjects\GameObjects\Player;
 
 class GameStateRulesTest extends TestCase
 {

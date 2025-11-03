@@ -2,7 +2,7 @@
 
 namespace App\GameObjects\Personalities\Traits;
 
-use App\Enums\Direction;
+use Vehikl\LvObjects\Enums\Direction;
 use Illuminate\Support\Arr;
 
 trait PicksGoodMoves

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\GameObjects\Arena;
+use Vehikl\LvObjects\GameObjects\Arena;
 use App\GameObjects\Personalities\KeepLane;
-use App\GameObjects\Player;
+use Vehikl\LvObjects\GameObjects\Player;
 use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Console\Command;
 use Illuminate\Http\Client\PendingRequest;

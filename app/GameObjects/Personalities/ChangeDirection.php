@@ -2,10 +2,10 @@
 
 namespace App\GameObjects\Personalities;
 
-use App\Enums\Direction;
-use App\GameObjects\Arena;
+use Vehikl\LvObjects\Enums\Direction;
+use Vehikl\LvObjects\GameObjects\Arena;
 use App\GameObjects\Personalities\Traits\PicksGoodMoves;
-use App\GameObjects\Player;
+use Vehikl\LvObjects\GameObjects\Player;
 
 class ChangeDirection implements Personality
 {

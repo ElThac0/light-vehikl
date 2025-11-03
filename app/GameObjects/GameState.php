@@ -12,6 +12,9 @@ use Exception;
 use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
 use Vehikl\LvObjects\GameObjects\Arena;
+use Vehikl\LvObjects\GameObjects\Bot;
+use Vehikl\LvObjects\GameObjects\Player;
+use Vehikl\LvObjects\GameObjects\StartLocation;
 
 class GameState
 {
