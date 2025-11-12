@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "407f5a0c1b732fd45fb093c1677a6c9b",
+    "content-hash": "84748507f79a27b2d94b1c697ed618ad",
     "packages": [
         {
             "name": "brick/math",
@@ -2576,7 +2576,7 @@
         },
         {
             "name": "light-vehikl/lvobjects",
-            "version": "dev-main",
+            "version": "0.1.0-alpha",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ElThac0/light-vehikl-objects.git",
@@ -2592,7 +2592,6 @@
                 "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": "^8.4"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -2619,7 +2618,7 @@
             "description": "Light Vehikl Game Object framework",
             "support": {
                 "issues": "https://github.com/ElThac0/light-vehikl-objects/issues",
-                "source": "https://github.com/ElThac0/light-vehikl-objects/tree/main"
+                "source": "https://github.com/ElThac0/light-vehikl-objects/tree/0.1.0-alpha"
             },
             "time": "2025-11-12T21:31:30+00:00"
         },
