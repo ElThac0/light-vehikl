@@ -2,22 +2,27 @@
 
 namespace Tests\Unit\GameState;
 
-use App\Enums\ContentType;
-use App\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
-use App\GameObjects\Tile;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use LightVehikl\LvObjects\Enums\ContentType;
+use LightVehikl\LvObjects\Enums\PlayerStatus;
+use LightVehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Tile;
 
 class GameStateTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Event::fake();
+    }
+
     public function testInitializes(): void
     {
         $gameState = new GameState(5);
 
-        $this->assertInstanceOf(GameState::class, $gameState);
         $this->assertCount(25, $gameState->toArray()['tiles']);
         $this->assertIsInt($gameState->getMaxPlayers());
     }
@@ -138,8 +143,6 @@ class GameStateTest extends TestCase
 
     public function testItUpdatesOnATick(): void
     {
-        Event::fake();
-
         $gameState = new GameState(5);
         $gameState->addPlayer(new Player('abc321'));
         $player1 = $gameState->getPlayer(ContentType::PLAYER1);

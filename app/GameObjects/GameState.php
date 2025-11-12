@@ -2,15 +2,19 @@
 
 namespace App\GameObjects;
 
-use App\Enums\ContentType;
-use App\Enums\Direction;
-use App\Enums\GameStatus;
-use App\Enums\PlayerStatus;
+use LightVehikl\LvObjects\Enums\ContentType;
+use LightVehikl\LvObjects\Enums\Direction;
+use LightVehikl\LvObjects\Enums\GameStatus;
+use LightVehikl\LvObjects\Enums\PlayerStatus;
 use App\Events\GameUpdated;
 use App\Traits\PersistInCache;
 use Exception;
 use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
+use LightVehikl\LvObjects\GameObjects\Arena;
+use LightVehikl\LvObjects\GameObjects\Bot;
+use LightVehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\StartLocation;
 
 class GameState
 {

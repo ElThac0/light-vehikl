@@ -2,8 +2,8 @@
 
 namespace App\GameObjects\Personalities;
 
-use App\Enums\Direction;
-use App\GameObjects\Arena;
+use LightVehikl\LvObjects\Enums\Direction;
+use LightVehikl\LvObjects\GameObjects\Arena;
 
 interface Personality
 {

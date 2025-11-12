@@ -2,11 +2,11 @@
 
 namespace App\Traits;
 
-use App\Enums\ContentType;
+use LightVehikl\LvObjects\ContentType;
 use App\GameObjects\Bot;
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
-use App\GameObjects\Tile;
+use LightVehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Tile;
 use Laravel\Octane\Facades\Octane;
 
 trait PersistInOctane

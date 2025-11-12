@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\PersonalityType;
+use LightVehikl\LvObjects\PersonalityType;
 use App\GameObjects\Bot;
 use App\GameObjects\GameState;
 use App\GameObjects\Personalities\ChangeDirection;

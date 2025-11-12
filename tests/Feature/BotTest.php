@@ -2,12 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Enums\Direction;
-use App\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Player;
 use Tests\TestCase;
-use App\GameObjects\Bot;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
+use LightVehikl\LvObjects\GameObjects\Bot;
 
 class BotTest extends TestCase
 {

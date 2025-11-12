@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use LightVehikl\LvObjects\GameObjects\Player;
 
 class JoinGame extends Controller
 {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Direction;
+use LightVehikl\LvObjects\Enums\Direction;
 use App\GameObjects\GameState;
-use App\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
