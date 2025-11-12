@@ -55,12 +55,6 @@
             "@php artisan migrate --graceful --ansi"
         ]
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../light-vehikl-objects"
-        }
-    ],
     "extra": {
         "laravel": {
             "dont-discover": []

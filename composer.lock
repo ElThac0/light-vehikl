@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0aa5d3fbf160fed0fefb755c8b156f4b",
+    "content-hash": "407f5a0c1b732fd45fb093c1677a6c9b",
     "packages": [
         {
             "name": "brick/math",
@@ -2577,15 +2577,22 @@
         {
             "name": "light-vehikl/lvobjects",
             "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ElThac0/light-vehikl-objects.git",
+                "reference": "5e19b2739edf650d6a3884ffbfa991c54ff02419"
+            },
             "dist": {
-                "type": "path",
-                "url": "../light-vehikl-objects",
-                "reference": "69691d7b436d83ea8ff0a770c0b64511eba72d58"
+                "type": "zip",
+                "url": "https://api.github.com/repos/ElThac0/light-vehikl-objects/zipball/5e19b2739edf650d6a3884ffbfa991c54ff02419",
+                "reference": "5e19b2739edf650d6a3884ffbfa991c54ff02419",
+                "shasum": ""
             },
             "require": {
                 "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
                 "php": "^8.4"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -2599,6 +2606,7 @@
                     "LightVehikl\\LvObjects\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2609,9 +2617,11 @@
                 }
             ],
             "description": "Light Vehikl Game Object framework",
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/ElThac0/light-vehikl-objects/issues",
+                "source": "https://github.com/ElThac0/light-vehikl-objects/tree/main"
+            },
+            "time": "2025-11-12T21:31:30+00:00"
         },
         {
             "name": "monolog/monolog",
