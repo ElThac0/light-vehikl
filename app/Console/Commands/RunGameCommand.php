@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Vehikl\LvObjects\Enums\GameStatus;
+use LightVehikl\LvObjects\Enums\GameStatus;
 use App\GameObjects\GameState;
 use Illuminate\Console\Command;
 use Illuminate\Support\Sleep;

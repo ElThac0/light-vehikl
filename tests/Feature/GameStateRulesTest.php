@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Vehikl\LvObjects\Enums\ContentType;
-use Vehikl\LvObjects\Enums\Direction;
-use Vehikl\LvObjects\Enums\PlayerStatus;
+use LightVehikl\LvObjects\Enums\ContentType;
+use LightVehikl\LvObjects\Enums\Direction;
+use LightVehikl\LvObjects\Enums\PlayerStatus;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use Vehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Player;
 
 class GameStateRulesTest extends TestCase
 {

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\GameObjects\GameState;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Vehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Player;
 
 class JoinGame extends Controller
 {

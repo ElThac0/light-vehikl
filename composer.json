@@ -14,7 +14,7 @@
         "laravel/tinker": "^2.9",
         "phrity/websocket": "^3.5",
         "tightenco/ziggy": "^2.0",
-        "vehikl/lvobjects": "dev-main"
+        "light-vehikl/lvobjects": "dev-main"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

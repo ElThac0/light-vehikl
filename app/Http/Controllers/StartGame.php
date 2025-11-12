@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Vehikl\LvObjects\Enums\PlayerStatus;
+use LightVehikl\LvObjects\Enums\PlayerStatus;
 use App\GameObjects\GameState;
-use Vehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Process;
 

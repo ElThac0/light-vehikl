@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Vehikl\LvObjects\GameObjects\Player>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\LightVehikl\LvObjects\GameObjects\Player>
  */
 class PlayerFactory extends Factory
 {

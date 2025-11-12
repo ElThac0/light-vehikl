@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GameObjects\GameState;
 use Illuminate\Http\Request;
-use Vehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Player;
 
 class CreateGame extends Controller
 {

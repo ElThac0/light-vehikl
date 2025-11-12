@@ -6,10 +6,10 @@ use App\Events\GameUpdated;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use Vehikl\LvObjects\Enums\ContentType;
-use Vehikl\LvObjects\Enums\PlayerStatus;
-use Vehikl\LvObjects\GameObjects\Player;
-use Vehikl\LvObjects\GameObjects\Tile;
+use LightVehikl\LvObjects\Enums\ContentType;
+use LightVehikl\LvObjects\Enums\PlayerStatus;
+use LightVehikl\LvObjects\GameObjects\Player;
+use LightVehikl\LvObjects\GameObjects\Tile;
 
 class GameStateTest extends TestCase
 {
