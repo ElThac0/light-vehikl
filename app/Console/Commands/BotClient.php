@@ -2,55 +2,32 @@
 
 namespace App\Console\Commands;
 
-use App\Console\Commands\BotClient;
-use LightVehikl\LvObjects\GameObjects\Arena;
 use App\GameObjects\Personalities\KeepLane;
-use LightVehikl\LvObjects\GameObjects\Player;
-use GuzzleHttp\Cookie\CookieJar;
-use Illuminate\Console\Command;
+use Exception;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use LightVehikl\LvObjects\GameObjects\Arena;
+use LightVehikl\LvObjects\GameObjects\Player;
 use WebSocket\Client as WSClient;
 
-class BotJoin extends Command
+class BotClient
 {
-    protected $signature = 'bot:join {gameId}';
+    private PendingRequest $webClient;
+    public function __construct(public string $host) {
 
-    protected $description = 'Add a bot to a game.';
-
-    protected string $host = 'http://localhost:8000';
-    protected string $webSocketHost = 'ws://localhost:8080/app/';
-    protected string $gameId;
-    protected array $gameState;
-    protected string $playerId;
-    protected CookieJar $cookies;
-    protected BotClient $client;
-
-    protected $webClient;
-
-    protected WSClient $ws;
-
-    public function handle(): void
-    {
-        $this->gameId = $this->argument('gameId');
-
-        $this->client = new BotClient($this->host);
-
-        $this->webClient = Http::setClient(Http::buildClient());
-
-        $this->joinGame($this->gameId);
-        $this->connectWebsocket();
-        $this->setReady();
-
-        $this->listenForUpdates();
     }
 
+    /**
+     * @throws Exception
+     */
     protected function joinGame(string $gameId): void
     {
+        $this->webClient = Http::setClient(Http::buildClient());
+
         $response = $this->webClient->post($this->host . '/join-game/' . $gameId);
 
         if (!$response->successful()) {
-            $this->error('Failed to join: ' . $response->body());
-            return;
+            throw new Exception('Failed to join: ' . $response->body());
         }
 
         $this->playerId = $response->json('yourId');
