@@ -33,13 +33,10 @@ class BotJoin extends Command
     {
         $this->gameId = $this->argument('gameId');
 
-        $this->client = new BotClient($this->host);
+        $this->client = new BotClient(new KeepLane(), $this->host, $this->webSocketHost, fn ($text) => $this->line($text));
 
-        $this->webClient = Http::setClient(Http::buildClient());
+        $this->client->connect($this->gameId);
 
-        $this->joinGame($this->gameId);
-        $this->connectWebsocket();
-        $this->setReady();
 
         $this->listenForUpdates();
     }
@@ -61,30 +58,6 @@ class BotJoin extends Command
     protected function setReady(): void
     {
         $this->webClient->post($this->host . '/mark-ready/' . $this->gameId);
-    }
-
-    protected function connectWebsocket(): void
-    {
-        $key = config('reverb.apps.apps.0.key');
-        $this->line('Connecting to websocket with key ' . $key);
-        $this->ws = new WSClient($this->webSocketHost . $key . '?protocol=7');
-        $this->ws
-            // Add standard middlewares
-            ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
-            ->addMiddleware(new \WebSocket\Middleware\FollowRedirect());
-
-        $channelName = "GameChannel-{$this->gameId}";
-
-        $subscribePayload = [
-            'event' => 'pusher:subscribe',
-            'data' => [
-                'auth' => 'asdf',
-                'channel' => $channelName,
-            ]
-        ];
-
-        $this->line("Subscribing to <info>{$channelName}</info>");
-        $this->ws->text(json_encode($subscribePayload));
     }
 
     protected function listenForUpdates(): void

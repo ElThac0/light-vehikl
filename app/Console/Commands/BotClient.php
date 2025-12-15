@@ -2,19 +2,36 @@
 
 namespace App\Console\Commands;
 
-use App\GameObjects\Personalities\KeepLane;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use LightVehikl\LvObjects\GameObjects\Arena;
+use LightVehikl\LvObjects\GameObjects\Personalities\Personality;
 use LightVehikl\LvObjects\GameObjects\Player;
 use WebSocket\Client as WSClient;
 
+/**
+ * @method output(string $string)
+ */
 class BotClient
 {
-    private PendingRequest $webClient;
-    public function __construct(public string $host) {
+    public PendingRequest $webClient;
+    public string $playerId;
+    public string $gameState;
 
+    public function __construct(public Personality $bot, public string $host, public string $socketHost, public \Closure $output) {
+        $this->webClient = Http::setClient(Http::buildClient());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function connect(string $gameId): void
+    {
+        $this->joinGame($gameId);
+        $this->connectWebsocket();
+        $this->setReady();
+        $this->listenForUpdates();
     }
 
     /**
@@ -22,8 +39,6 @@ class BotClient
      */
     protected function joinGame(string $gameId): void
     {
-        $this->webClient = Http::setClient(Http::buildClient());
-
         $response = $this->webClient->post($this->host . '/join-game/' . $gameId);
 
         if (!$response->successful()) {
@@ -32,7 +47,7 @@ class BotClient
 
         $this->playerId = $response->json('yourId');
         $this->gameState = $response->json('gameState');
-        $this->line('Joined as player: <info>' . $this->playerId . '</info>');
+        $this->output('Joined as player: <info>' . $this->playerId . '</info>');
     }
 
     protected function setReady(): void
@@ -88,13 +103,13 @@ class BotClient
 
         $playerData = collect($data['players'])->first(fn(array $player) => $player['id'] === $this->playerId);
         $player = Player::deserialize($playerData);
-        $personality = new KeepLane($player);
-        $move = $personality->decideMove($arena);
+        $this->bot->updatePlayer($player);
+        $move = $this->bot->decideMove($arena);
         if ($move) {
             $this->webClient->post($this->host . "/game/{$this->gameId}/move", ['direction' => $move->value]);
-            $this->info("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
+            $this->output("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
         } else {
-            $this->info("[{$tick}:{$data['status']}] No move.");
+            $this->output("[{$tick}:{$data['status']}] No move.");
         }
     }
 }
