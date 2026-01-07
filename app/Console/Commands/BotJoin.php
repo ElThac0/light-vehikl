@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\GameObjects\Personalities\KeepLane;
 use Illuminate\Console\Command;
+use LightVehikl\LvObjects\Bots\BotClient;
 use WebSocket\Client as WSClient;
+
 
 class BotJoin extends Command
 {

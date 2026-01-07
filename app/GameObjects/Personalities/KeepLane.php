@@ -19,9 +19,10 @@ class KeepLane implements Personality
     {
     }
 
-    public function updatePlayer(Player $player): void
+    public function updatePlayer(Player $player): static
     {
         $this->player = $player;
+        return $this;
     }
 
     public function decideMove(Arena $arena): ?Direction
