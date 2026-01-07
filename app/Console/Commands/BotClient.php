@@ -17,9 +17,16 @@ class BotClient
 {
     public PendingRequest $webClient;
     public string $playerId;
-    public string $gameState;
+    public array $gameState;
+    private WSClient $ws;
+    private string $gameId;
 
-    public function __construct(public Personality $bot, public string $host, public string $socketHost, public \Closure $output) {
+    public function __construct(
+        public Personality $bot,
+        public string $host,
+        public string $socketHost,
+        public \Closure $output
+    ) {
         $this->webClient = Http::setClient(Http::buildClient());
     }
 
@@ -45,9 +52,10 @@ class BotClient
             throw new Exception('Failed to join: ' . $response->body());
         }
 
+        $this->gameId = $gameId;
         $this->playerId = $response->json('yourId');
         $this->gameState = $response->json('gameState');
-        $this->output('Joined as player: <info>' . $this->playerId . '</info>');
+        ($this->output)('Joined as player: <info>' . $this->playerId . '</info>');
     }
 
     protected function setReady(): void
@@ -58,8 +66,8 @@ class BotClient
     protected function connectWebsocket(): void
     {
         $key = config('reverb.apps.apps.0.key');
-        $this->line('Connecting to websocket with key ' . $key);
-        $this->ws = new WSClient($this->webSocketHost . $key . '?protocol=7');
+        ($this->output)('Connecting to websocket with key ' . $key);
+        $this->ws = new WSClient($this->socketHost . $key . '?protocol=7');
         $this->ws
             // Add standard middlewares
             ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
@@ -75,7 +83,7 @@ class BotClient
             ]
         ];
 
-        $this->line("Subscribing to <info>{$channelName}</info>");
+        ($this->output)("Subscribing to <info>{$channelName}</info>");
         $this->ws->text(json_encode($subscribePayload));
     }
 
@@ -93,7 +101,7 @@ class BotClient
                 $this->handleGameUpdate(json_decode($content->data, true));
                 break;
             default:
-                $this->error('unknown event: ' . $content->event);
+                ($this->output)('unknown event: ' . $content->event);
         }
     }
 
@@ -107,9 +115,9 @@ class BotClient
         $move = $this->bot->decideMove($arena);
         if ($move) {
             $this->webClient->post($this->host . "/game/{$this->gameId}/move", ['direction' => $move->value]);
-            $this->output("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
+            ($this->output)("[{$tick}:{$data['status']}] Changed direction to <info>{$move->value}</info>");
         } else {
-            $this->output("[{$tick}:{$data['status']}] No move.");
+            ($this->output)("[{$tick}:{$data['status']}] No move.");
         }
     }
 }
