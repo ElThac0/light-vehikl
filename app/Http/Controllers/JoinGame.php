@@ -42,6 +42,10 @@ class JoinGame extends Controller
 
         $request->session()->put('active_game', $gameState->getId());
 
-        return response()->json(['gameState' => $gameState->toArray(), 'yourId' => $player->id]);
+        return response()->json([
+            'gameState' => $gameState->toArray(),
+            'yourId' => $player->id,
+            'webSocketKey' => config('reverb.apps.apps.0.key'),
+        ]);
     }
 }
