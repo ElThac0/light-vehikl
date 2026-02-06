@@ -204,7 +204,8 @@ class GameState
 
     public function shouldEnd(): bool
     {
-        return $this->getPlayers()->every(fn (Player $player) => $player->crashed());
+        $crashedPlayers = $this->getPlayers()->filter(fn (Player $player) => $player->crashed());
+        return $this->getPlayers()->count() - $crashedPlayers->count() <= 1;
     }
 
     public function isActive(): bool

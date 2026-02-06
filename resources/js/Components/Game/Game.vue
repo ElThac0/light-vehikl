@@ -14,6 +14,7 @@ const activeGame = ref(null);
 const players = computed(() => activeGame.value?.players);
 const board = computed(() => activeGame.value?.tiles);
 const arenaSize = computed(() => activeGame.value?.arenaSize);
+const gameStatus = computed(() => activeGame.value?.status);
 
 const addPlayer = (player) => {
   players.value.push(player);
