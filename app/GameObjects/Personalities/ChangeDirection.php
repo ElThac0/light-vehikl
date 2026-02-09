@@ -12,9 +12,14 @@ class ChangeDirection implements Personality
     use PicksGoodMoves;
 
     private Arena $arena;
+    private Player $player;
 
-    public function __construct(private Player $player)
+    public function __construct()
     {
+    }
+
+    public function updatePlayer(Player $player) {
+        $this->player = $player;
     }
 
     public function decideMove(Arena $arena): ?Direction

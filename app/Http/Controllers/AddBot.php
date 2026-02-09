@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use LightVehikl\LvObjects\PersonalityType;
 use App\GameObjects\Bot;
 use App\GameObjects\GameState;
-use App\GameObjects\Personalities\ChangeDirection;
-use App\GameObjects\Personalities\KeepLane;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
