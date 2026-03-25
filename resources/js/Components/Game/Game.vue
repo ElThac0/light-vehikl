@@ -1,9 +1,9 @@
 <script setup>
-import Tile from './Tile.vue'
-import {onMounted, ref, computed} from "vue";
+import { computed, onMounted, ref } from "vue";
 import GameList from "@/Components/Game/GameList.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Players from "@/Components/Game/Players.vue";
+import GameBoard from "@/Components/Game/GameBoard.vue";
 
 const props = defineProps({
   sessionId: String,
@@ -132,18 +132,9 @@ onMounted(async () => {
     </div>
     <div v-if="activeGame" class="w-2/3">
       <h2>In Game: {{ activeGame?.id }}</h2>
-      <div id="board" :style="{ 'grid-template-columns': '1fr '.repeat(arenaSize), 'grid-template-rows': '1fr '.repeat(arenaSize) }">
-        <Tile v-for="(tile, idx) in board" :contents="tile" :players="players" :key="idx" />
-      </div>
+      <GameBoard :arena-size="arenaSize" :board="board" :players="players"/>
     </div>
   </div>
 
 </template>
 
-<style>
-#board {
-  max-width: 75vh;
-  margin: auto;
-  display: grid;
-}
-</style>
