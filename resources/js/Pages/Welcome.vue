@@ -20,9 +20,6 @@ defineProps({
     },
     sessionId: {
         type: String,
-    },
-    gameList: {
-        type: Array,
     }
 });
 </script>
@@ -37,7 +34,7 @@ defineProps({
               <HeaderNav />
 
                 <main class="mt-6">
-                  <Game :sessionId="sessionId" :gameList="gameList" />
+                  <Game :sessionId="sessionId" />
                 </main>
 
                 <footer class="py-16 text-center text-sm text-black dark:text-white/70">

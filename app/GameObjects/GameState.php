@@ -2,6 +2,7 @@
 
 namespace App\GameObjects;
 
+use Illuminate\Support\Carbon;
 use LightVehikl\LvObjects\Enums\ContentType;
 use LightVehikl\LvObjects\Enums\Direction;
 use LightVehikl\LvObjects\Enums\GameStatus;
@@ -30,12 +31,14 @@ class GameState
     protected int $maxX, $maxY;
     protected GameStatus $status = GameStatus::WAITING;
     protected int $tick = 0;
+    public Carbon $createdAt;
 
     public function __construct(protected int $arenaSize, $id = null)
     {
         $this->arena = new Arena($arenaSize);
         $this->maxX = $this->maxY = $this->arenaSize - 1;
         $this->id = $id ?? Uuid::uuid4()->toString();
+        $this->createdAt = Carbon::now();
     }
 
     public function getMaxPlayers(): int
