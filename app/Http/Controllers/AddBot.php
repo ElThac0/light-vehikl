@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use LightVehikl\LvObjects\PersonalityType;
-use App\GameObjects\Bot;
 use App\GameObjects\GameState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use LightVehikl\LvObjects\Enums\PersonalityType;
+use LightVehikl\LvObjects\GameObjects\Bot;
 
 class AddBot extends Controller
 {

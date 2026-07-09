@@ -14,8 +14,26 @@ trait PersistInCache
         return Cache::get('game-' . $id);
     }
 
+    /**
+     * @throws
+     */
     public function save(): void
     {
-        Cache::set('game-' . $this->id, $this);
+        cache()->set('game-' . $this->id, $this);
+        cache()->remember('game_list', 3600, function () {
+            return [];
+        });
+        $gameList[] = $this->getId();
+        cache()->put('game_list', $gameList);
+    }
+
+    /**
+     * @return GameState[]
+     */
+    public static function list(): array
+    {
+        return Cache::remember('game_list', 3600, function () {
+            return [];
+        });
     }
 }

@@ -11,12 +11,21 @@
 
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { onBeforeMount, ref } from "vue";
 
 const emit = defineEmits(['joined-game']);
 const props = defineProps({
   gameList: Array,
   activeGame: Object,
 });
+
+const gameList = ref([])
+
+onBeforeMount(async () => {
+  const response = await axios.get(route('game.list'));
+
+  gameList.value = response.data
+})
 
 async function joinGame(id) {
   try {
