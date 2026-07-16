@@ -5,6 +5,7 @@ namespace Tests\Unit\GameState;
 use App\Events\GameUpdated;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 use LightVehikl\LvObjects\Enums\ContentType;
 use LightVehikl\LvObjects\Enums\PlayerStatus;
@@ -27,9 +28,7 @@ class GameStateTest extends TestCase
         $this->assertIsInt($gameState->getMaxPlayers());
     }
 
-    /**
-     * @dataProvider tileCoordinates
-     */
+    #[DataProvider('tileCoordinates')]
     public function testItCanAccessATile($x, $y): void
     {
         $gameState = new GameState(5);
