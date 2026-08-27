@@ -16,16 +16,8 @@ class GameMove extends Controller
             return response()->json('Bad direction', 422);
         }
 
-        return GameState::mutate($id, function (GameState $gameState) use ($request, $direction) {
-            $player = $gameState->findPlayer($request->session()->getId());
+        $game = GameState::mutate($id, fn (GameState $gameState) => $gameState->setPlayerDirection($request->session()->getId(), $direction));
 
-            if (! $player) {
-                return response()->json('Player not in game', 404);
-            }
-
-            $player->setDirection($direction);
-
-            return response()->json($gameState->toArray());
-        });
+        return response()->json($game->toArray());
     }
 }

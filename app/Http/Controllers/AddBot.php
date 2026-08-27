@@ -12,17 +12,8 @@ class AddBot extends Controller
 {
     public function __invoke(Request $request, string $id)
     {
-        return GameState::mutate($id, function (GameState $gameState) {
-            $personality = Arr::random(PersonalityType::cases());
+        $game = GameState::mutate($id, fn (GameState $gameState) => $gameState->addBot(new Bot(null, Arr::random(PersonalityType::cases()))));
 
-            $bot = new Bot(null, $personality);
-            try {
-                $gameState->addBot($bot);
-            } catch (\Exception $e) {
-                return response()->json($e->getMessage(), 500);
-            }
-
-            return response()->json($gameState->toArray());
-        });
+        return response()->json($game->toArray());
     }
 }

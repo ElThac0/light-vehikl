@@ -33,11 +33,7 @@ class RunGameCommand extends Command
             $over = false;
 
             while (! $over) {
-                $over = GameState::mutate($gameId, function (GameState $game) {
-                    $game->nextTick();
-
-                    return $game->isOver();
-                });
+                $over = GameState::mutate($gameId, fn (GameState $game) => $game->nextTick())->isOver();
 
                 if (! $over) {
                     Sleep::for(200)->milliseconds();

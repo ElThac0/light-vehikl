@@ -32,11 +32,7 @@ class GameServiceProvider extends ServiceProvider
 
             collect($gameList)->each(function ($gameId) {
                 try {
-                    $over = GameState::mutate($gameId, function (GameState $game) {
-                        $game->nextTick();
-
-                        return $game->isOver();
-                    });
+                    $over = GameState::mutate($gameId, fn (GameState $game) => $game->nextTick())->isOver();
                 } catch (GameNotFound) {
                     $over = true;
                 }
