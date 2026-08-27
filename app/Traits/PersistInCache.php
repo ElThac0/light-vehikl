@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Exceptions\GameNotFound;
 use App\GameObjects\GameState;
 use Closure;
 use Illuminate\Support\Facades\Cache;
@@ -29,23 +30,26 @@ trait PersistInCache
      * Run a load-mutate-save against a single game while holding an exclusive
      * lock on it, so concurrent ticks / moves / joins can't clobber each other.
      *
-     * The freshly loaded GameState (or null if it doesn't exist) is passed to
-     * the callback; whatever the callback leaves it in is persisted once the
-     * callback returns. If the callback throws, nothing is saved.
+     * The freshly loaded GameState is passed to the callback and whatever the
+     * callback leaves it in is persisted once the callback returns. If the game
+     * doesn't exist a GameNotFound is thrown before the callback runs; if the
+     * callback itself throws, nothing is saved.
      *
      * @template T
      *
-     * @param  Closure(GameState|null): T  $callback
+     * @param  Closure(GameState): T  $callback
      * @return T
+     *
+     * @throws GameNotFound
      */
     public static function mutate(string $id, Closure $callback): mixed
     {
         return Cache::lock('game-'.$id.'-lock', static::$lockTtl)->block(static::$lockWait, function () use ($id, $callback) {
-            $game = static::find($id);
+            $game = static::find($id) ?? throw GameNotFound::for($id);
 
             $result = $callback($game);
 
-            $game?->save();
+            $game->save();
 
             return $result;
         });

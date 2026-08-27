@@ -10,11 +10,7 @@ class MarkReady extends Controller
 {
     public function __invoke(Request $request, string $id)
     {
-        return GameState::mutate($id, function (?GameState $gameState) use ($request) {
-            if (! $gameState) {
-                return response()->json('Game not found', 404);
-            }
-
+        return GameState::mutate($id, function (GameState $gameState) use ($request) {
             try {
                 $gameState->setReady($request->session()->getId());
             } catch (Exception $e) {

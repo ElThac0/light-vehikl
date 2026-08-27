@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\GameNotFound;
 use App\GameObjects\GameState;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -18,8 +19,10 @@ Schedule::call(function () {
     }
 
     collect($gameList)->each(function ($gameId) {
-        GameState::mutate($gameId, function (?GameState $game) {
-            $game?->nextTick();
-        });
+        try {
+            GameState::mutate($gameId, fn (GameState $game) => $game->nextTick());
+        } catch (GameNotFound) {
+            GameState::forget($gameId);
+        }
     });
 })->everySecond();

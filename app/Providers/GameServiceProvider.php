@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Exceptions\GameNotFound;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -30,15 +31,15 @@ class GameServiceProvider extends ServiceProvider
             }
 
             collect($gameList)->each(function ($gameId) {
-                $over = GameState::mutate($gameId, function (?GameState $game) {
-                    if (! $game) {
-                        return true;
-                    }
+                try {
+                    $over = GameState::mutate($gameId, function (GameState $game) {
+                        $game->nextTick();
 
-                    $game->nextTick();
-
-                    return $game->isOver();
-                });
+                        return $game->isOver();
+                    });
+                } catch (GameNotFound) {
+                    $over = true;
+                }
 
                 if ($over) {
                     logger()->warning("Game {$gameId} is over");

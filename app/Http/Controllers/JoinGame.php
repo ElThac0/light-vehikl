@@ -11,11 +11,7 @@ class JoinGame extends Controller
 {
     public function __invoke(Request $request, string $id)
     {
-        return GameState::mutate($id, function (?GameState $gameState) use ($request) {
-            if (! $gameState) {
-                return response()->json('Game not found', Response::HTTP_NOT_FOUND);
-            }
-
+        return GameState::mutate($id, function (GameState $gameState) use ($request) {
             $playerId = $request->session()->getId();
 
             if ($gameState->findPlayer($playerId)) {

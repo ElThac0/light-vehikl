@@ -12,11 +12,7 @@ class StartGame extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        return GameState::mutate($id, function (?GameState $gameState) {
-            if (! $gameState) {
-                return response()->json('Game not found', 404);
-            }
-
+        return GameState::mutate($id, function (GameState $gameState) {
             if ($gameState->getPlayers()->count() < 2) {
                 return response()->json('Not enough players', 500);
             }

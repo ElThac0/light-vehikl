@@ -12,11 +12,7 @@ class AddBot extends Controller
 {
     public function __invoke(Request $request, string $id)
     {
-        return GameState::mutate($id, function (?GameState $gameState) {
-            if (! $gameState) {
-                return response()->json('Game not found', 404);
-            }
-
+        return GameState::mutate($id, function (GameState $gameState) {
             $personality = Arr::random(PersonalityType::cases());
 
             $bot = new Bot(null, $personality);
