@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A Laravel 11 + Inertia (Vue 3) app implementing a real-time multiplayer "light cycle" / Tron-style grid game. Players join a game, move around an arena leaving trails, and crash if they hit a wall or trail. Game state updates are pushed to clients over WebSockets (Laravel Reverb).
+A Laravel 13 + Inertia (Vue 3) app implementing a real-time multiplayer "light cycle" / Tron-style grid game. Players join a game, move around an arena leaving trails, and crash if they hit a wall or trail. Game state updates are pushed to clients over WebSockets (Laravel Reverb).
 
 Core game domain objects (`Arena`, `Player`, `Bot`, `Tile`, `StartLocation`, and enums like `ContentType`, `Direction`, `GameStatus`, `PlayerStatus`) live in an external package, `light-vehikl/lvobjects` (namespace `LightVehikl\LvObjects\...`), pulled from a git repo (see `composer.json` repositories / `composer.lock`), not from this repo. When you need to see how those objects behave, look in `vendor/light-vehikl/lvobjects`.
 
