@@ -10,22 +10,23 @@ use LightVehikl\LvObjects\GameObjects\Bot;
 
 class AddBot extends Controller
 {
-    public function __invoke(Request $request, string $id) {
-        $gameState = GameState::find($id);
+    public function __invoke(Request $request, string $id)
+    {
+        return GameState::mutate($id, function (?GameState $gameState) {
+            if (! $gameState) {
+                return response()->json('Game not found', 404);
+            }
 
-        $knownPersonalities = PersonalityType::cases();
+            $personality = Arr::random(PersonalityType::cases());
 
-        $personality = Arr::random($knownPersonalities);
+            $bot = new Bot(null, $personality);
+            try {
+                $gameState->addBot($bot);
+            } catch (\Exception $e) {
+                return response()->json($e->getMessage(), 500);
+            }
 
-        $bot = new Bot(null, $personality);
-        try {
-            $gameState->addBot($bot);
-        } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 500);
-        }
-
-        $gameState->save();
-
-        return response()->json($gameState->toArray());
+            return response()->json($gameState->toArray());
+        });
     }
 }

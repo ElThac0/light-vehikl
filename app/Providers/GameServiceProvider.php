@@ -25,21 +25,24 @@ class GameServiceProvider extends ServiceProvider
         Octane::tick('game-state', function () {
             $gameList = Cache::get('game_list');
 
-            if (!$gameList) {
+            if (! $gameList) {
                 return;
             }
 
-            collect($gameList)->each(function ($gameId) use ($gameList) {
-                $game = GameState::find($gameId);
-                $game->nextTick();
-                $game->save();
+            collect($gameList)->each(function ($gameId) {
+                $over = GameState::mutate($gameId, function (?GameState $game) {
+                    if (! $game) {
+                        return true;
+                    }
 
-                if ($game->isOver()) {
+                    $game->nextTick();
+
+                    return $game->isOver();
+                });
+
+                if ($over) {
                     logger()->warning("Game {$gameId} is over");
-                    $gameList = array_filter($gameList, function ($item) use ($gameId) {
-                        return $item !== $gameId;
-                    });
-                    Cache::set('game_list', $gameList);
+                    GameState::forget($gameId);
                 }
             });
         })->seconds(1);

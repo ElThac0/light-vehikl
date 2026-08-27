@@ -2,14 +2,12 @@
 
 namespace App\Console\Commands;
 
-use LightVehikl\LvObjects\Enums\GameStatus;
 use App\GameObjects\GameState;
 use Illuminate\Console\Command;
 use Illuminate\Support\Sleep;
+use LightVehikl\LvObjects\Enums\GameStatus;
 use LightVehikl\LvObjects\Enums\PlayerStatus;
 use LightVehikl\LvObjects\GameObjects\Player;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class RunGameCommand extends Command
 {
@@ -22,26 +20,37 @@ class RunGameCommand extends Command
     public function handle(): void
     {
         $gameId = $this->argument('gameId');
-        $game = GameState::find($gameId);
-        $game->setStatus(GameStatus::ACTIVE);
-        $game->getPlayers()->each(fn (Player $player) => $player->setStatus(PlayerStatus::ACTIVE));
+
+        GameState::mutate($gameId, function (?GameState $game) {
+            if (! $game) {
+                return;
+            }
+
+            $game->setStatus(GameStatus::ACTIVE);
+            $game->getPlayers()->each(fn (Player $player) => $player->setStatus(PlayerStatus::ACTIVE));
+        });
+
         $this->info('Running game...');
 
-        while (!$game->isOver()) {
-            $game->nextTick();
-            $game->save();
-            Sleep::for(200)->milliseconds();
-            $game = GameState::find($gameId);
+        $over = false;
+
+        while (! $over) {
+            $over = GameState::mutate($gameId, function (?GameState $game) {
+                if (! $game) {
+                    return true;
+                }
+
+                $game->nextTick();
+
+                return $game->isOver();
+            });
+
+            if (! $over) {
+                Sleep::for(200)->milliseconds();
+            }
         }
 
-        try {
-            $gameList = cache()->get('game_list');
-            $gameList = array_diff($gameList, [$gameId]);
-        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
-            $gameList = [];
-        }
-
-        cache()->put('game_list', $gameList);
+        GameState::forget($gameId);
 
         $this->info('Done.');
     }

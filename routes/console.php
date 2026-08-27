@@ -18,8 +18,8 @@ Schedule::call(function () {
     }
 
     collect($gameList)->each(function ($gameId) {
-        $game = GameState::find($gameId);
-        $game->nextTick();
-        $game->save();
+        GameState::mutate($gameId, function (?GameState $game) {
+            $game?->nextTick();
+        });
     });
 })->everySecond();

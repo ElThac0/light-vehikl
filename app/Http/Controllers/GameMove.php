@@ -2,32 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use LightVehikl\LvObjects\Enums\Direction;
 use App\GameObjects\GameState;
-use LightVehikl\LvObjects\GameObjects\Player;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use LightVehikl\LvObjects\Enums\Direction;
 
 class GameMove extends Controller
 {
     public function __invoke(Request $request, string $id)
     {
-        $gameState = GameState::find($id);
-
-        $playerId = $request->session()->getId();
-
-        $player = $gameState->findPlayer($playerId);
-
         $direction = Direction::tryFrom($request->input('direction'));
 
-        if (!$direction) {
+        if (! $direction) {
             return response()->json('Bad direction', 422);
         }
 
-        $player->setDirection($direction);
+        return GameState::mutate($id, function (?GameState $gameState) use ($request, $direction) {
+            if (! $gameState) {
+                return response()->json('Game not found', 404);
+            }
 
-        $gameState->save();
+            $player = $gameState->findPlayer($request->session()->getId());
 
-        return response()->json($gameState->toArray());
+            if (! $player) {
+                return response()->json('Player not in game', 404);
+            }
+
+            $player->setDirection($direction);
+
+            return response()->json($gameState->toArray());
+        });
     }
 }
