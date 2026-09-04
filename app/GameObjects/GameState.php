@@ -68,6 +68,9 @@ class GameState
         return $this->arena->getStartLocations()[$startIndex];
     }
 
+    /**
+     * @return Collection<int, Player>
+     */
     public function getPlayers(): Collection
     {
         return collect($this->players);
