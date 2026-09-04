@@ -13,9 +13,8 @@ class KeepLane implements Personality
     use PicksGoodMoves;
 
     private Arena $arena;
-    private Player $player;
 
-    public function __construct()
+    public function __construct(private Player $player)
     {
     }
 
