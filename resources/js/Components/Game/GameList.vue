@@ -25,6 +25,11 @@ onBeforeMount(async () => {
   const response = await axios.get(route('game.list'));
 
   gameList.value = response.data
+
+  window.Echo.channel('GameChannel')
+      .listen('.game.created', (event) => {
+        gameList.value = event.games
+      })
 })
 
 async function joinGame(id) {

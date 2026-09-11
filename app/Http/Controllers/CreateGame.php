@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\GameCreated;
 use App\GameObjects\GameState;
 use Illuminate\Http\Request;
 use LightVehikl\LvObjects\GameObjects\Player;
@@ -20,6 +21,8 @@ class CreateGame extends Controller
 
         $gameState->save();
         $gameState->track();
+
+        GameCreated::dispatch($gameState);
 
         return response()->json($gameState->toArray());
     }
