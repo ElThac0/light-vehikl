@@ -4,12 +4,6 @@ import Game from '@/Components/Game/Game.vue'
 import HeaderNav from "@/Layouts/HeaderNav.vue";
 
 defineProps({
-    canLogin: {
-        type: Boolean,
-    },
-    canRegister: {
-        type: Boolean,
-    },
     laravelVersion: {
         type: String,
         required: true,
