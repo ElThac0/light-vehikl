@@ -257,7 +257,13 @@ class GameState
 
     protected function serializePlayers(): array
     {
-        return array_values($this->players);
+        return collect($this->players)
+            ->map(fn (Player $player, int $slot) => [
+                ...$player->jsonSerialize(),
+                'isBot' => isset($this->bots[$slot]),
+            ])
+            ->values()
+            ->all();
     }
 
     public function toArray(): array

@@ -12,6 +12,9 @@ const props = defineProps({
   <ul>
     <li v-for="player in players" :key="`player-${player.id}`" class="py-2 border-b border-gray-200">
       {{ player.id }}
+      <span v-if="player.isBot" class="ml-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-xs font-bold uppercase">
+        Bot
+      </span>
 
       <div class="font-bold uppercase text-sm">
         <div v-if="player.status === 'waiting'" class="text-gray-500">

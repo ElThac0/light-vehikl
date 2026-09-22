@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 use LightVehikl\LvObjects\Enums\ContentType;
 use LightVehikl\LvObjects\Enums\PlayerStatus;
+use LightVehikl\LvObjects\GameObjects\Bot;
 use LightVehikl\LvObjects\GameObjects\Player;
 use LightVehikl\LvObjects\GameObjects\Tile;
 
@@ -201,5 +202,17 @@ class GameStateTest extends TestCase
         $this->assertFalse($gameState->isOver());
         $this->assertContains($gameState->getId(), GameState::list());
         Event::assertNotDispatched(GameEnded::class);
+    }
+
+    public function testItMarksBotsInTheSerializedPlayers(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('human'));
+        $gameState->addBot(new Bot);
+
+        $players = collect($gameState->toArray()['players'])->keyBy('id');
+
+        $this->assertFalse($players['human']['isBot']);
+        $this->assertTrue($players->except('human')->first()['isBot']);
     }
 }
