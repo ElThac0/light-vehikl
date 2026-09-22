@@ -3,6 +3,7 @@
 namespace App\GameObjects;
 
 use App\Events\GameEnded;
+use App\Events\GameRemoved;
 use App\Events\GameUpdated;
 use App\Exceptions\GameAlreadyStarted;
 use App\Exceptions\GameFull;
@@ -39,6 +40,12 @@ class GameState
     /** @var array<Bot> */
     protected array $bots = [];
 
+    /** @var array<string> Ids of players who left after the game started. */
+    protected array $departed = [];
+
+    /** @var array<string> Ids of players who have joined the game's presence channel. */
+    protected array $presenceTracked = [];
+
     protected int $maxX;
 
     protected int $maxY;
@@ -64,9 +71,8 @@ class GameState
 
     public function getNextStartLocation(): StartLocation
     {
-        $startIndex = count($this->getPlayers());
-
-        return $this->arena->getStartLocations()[$startIndex];
+        return collect($this->arena->getStartLocations())
+            ->first(fn (StartLocation $start) => ! isset($this->players[$start->playerType->value]));
     }
 
     /**
@@ -135,6 +141,103 @@ class GameState
         $this->addPlayer($player);
 
         return $player;
+    }
+
+    /**
+     * Take a player out of the game. Before the game starts they give up
+     * their slot; once it's running they stay on the board as crashed.
+     *
+     * @throws PlayerNotInGame
+     */
+    public function leave(string $playerId): void
+    {
+        $player = $this->findPlayer($playerId) ?? throw new PlayerNotInGame;
+
+        if ($this->hasLeft($playerId)) {
+            return;
+        }
+
+        if ($this->status === GameStatus::WAITING) {
+            $this->arena->getTile(...$player->getLocation())->setContents(ContentType::EMPTY);
+            unset($this->players[$player->getSlot()->value]);
+            $this->presenceTracked = array_values(array_diff($this->presenceTracked, [$playerId]));
+        } else {
+            if ($this->isActive()) {
+                $player->setStatus(PlayerStatus::CRASHED);
+            }
+
+            $this->departed[] = $playerId;
+        }
+
+        GameUpdated::dispatch($this);
+    }
+
+    /**
+     * Whether anyone other than a server-side bot is still in the game.
+     */
+    public function hasHumanPlayers(): bool
+    {
+        return $this->getHumanPlayers()->isNotEmpty();
+    }
+
+    /**
+     * Players who aren't server-side bots and haven't left.
+     *
+     * @return Collection<int, Player>
+     */
+    public function getHumanPlayers(): Collection
+    {
+        return $this->getPlayers()->filter(fn (Player $player, int $slot) => ! isset($this->bots[$slot])
+            && ! $this->hasLeft($player->getId()));
+    }
+
+    protected function hasLeft(string $playerId): bool
+    {
+        return in_array($playerId, $this->departed, true);
+    }
+
+    /**
+     * Note that a player has joined the presence channel, so from now on
+     * their disconnecting from it counts as leaving. Players who never join
+     * it (e.g. remote clients on the public channel) are never removed this way.
+     *
+     * @throws PlayerNotInGame
+     */
+    public function trackPresence(string $playerId): void
+    {
+        $this->findPlayer($playerId) ?? throw new PlayerNotInGame;
+
+        $this->presenceTracked = array_values(array_unique([...$this->presenceTracked, $playerId]));
+    }
+
+    /**
+     * Remove every presence-tracked human who isn't among the ids currently
+     * connected to the presence channel.
+     *
+     * @param  array<string>  $connectedIds
+     */
+    public function disconnectAbsentPlayers(array $connectedIds): void
+    {
+        $this->getHumanPlayers()
+            ->filter(fn (Player $player) => in_array($player->getId(), $this->presenceTracked, true)
+                && ! in_array($player->getId(), $connectedIds, true))
+            ->each(fn (Player $player) => $this->leave($player->getId()));
+    }
+
+    /**
+     * Delete the game once no humans are left in it, letting lobbies know.
+     */
+    public static function removeIfAbandoned(GameState $game): bool
+    {
+        if ($game->hasHumanPlayers()) {
+            return false;
+        }
+
+        static::forget($game->getId());
+
+        GameRemoved::dispatch($game);
+
+        return true;
     }
 
     /** @throws GameNotStartable */

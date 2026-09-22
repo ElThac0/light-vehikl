@@ -4,11 +4,13 @@ namespace Tests\Unit\GameState;
 
 use App\Events\GameEnded;
 use App\Events\GameUpdated;
+use App\Exceptions\PlayerNotInGame;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 use LightVehikl\LvObjects\Enums\ContentType;
+use LightVehikl\LvObjects\Enums\GameStatus;
 use LightVehikl\LvObjects\Enums\PlayerStatus;
 use LightVehikl\LvObjects\GameObjects\Bot;
 use LightVehikl\LvObjects\GameObjects\Player;
@@ -214,5 +216,112 @@ class GameStateTest extends TestCase
 
         $this->assertFalse($players['human']['isBot']);
         $this->assertTrue($players->except('human')->first()['isBot']);
+    }
+
+    public function testLeavingBeforeTheGameStartsFreesTheSlot(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('first'));
+        $gameState->addPlayer(new Player('second'));
+
+        $gameState->leave('first');
+        $gameState->addPlayer(new Player('third'));
+
+        $this->assertNull($gameState->findPlayer('first'));
+        $this->assertEquals(ContentType::PLAYER1, $gameState->findPlayer('third')->getSlot());
+        $this->assertEquals(ContentType::PLAYER2, $gameState->findPlayer('second')->getSlot());
+    }
+
+    public function testLeavingARunningGameCrashesThePlayer(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('first'));
+        $gameState->addPlayer(new Player('second'));
+        $gameState->setStatus(GameStatus::ACTIVE);
+
+        $gameState->leave('first');
+
+        $this->assertEquals(PlayerStatus::CRASHED, $gameState->findPlayer('first')->getStatus());
+        $this->assertTrue($gameState->hasHumanPlayers());
+    }
+
+    public function testItHasNoHumanPlayersOnceOnlyBotsRemain(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('human'));
+        $gameState->addBot(new Bot);
+
+        $this->assertTrue($gameState->hasHumanPlayers());
+
+        $gameState->leave('human');
+
+        $this->assertFalse($gameState->hasHumanPlayers());
+    }
+
+    public function testItHasNoHumanPlayersOnceEveryoneLeavesARunningGame(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('human'));
+        $gameState->addBot(new Bot);
+        $gameState->setStatus(GameStatus::ACTIVE);
+
+        $gameState->leave('human');
+
+        $this->assertFalse($gameState->hasHumanPlayers());
+    }
+
+    public function testLeavingAGameYouAreNotInThrows(): void
+    {
+        $gameState = new GameState(5);
+
+        $this->expectException(PlayerNotInGame::class);
+
+        $gameState->leave('nobody');
+    }
+
+    public function testDisconnectingRemovesOnlyPresenceTrackedPlayers(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('browser'));
+        $gameState->addPlayer(new Player('remote'));
+        $gameState->trackPresence('browser');
+
+        $gameState->disconnectAbsentPlayers([]);
+
+        $this->assertNull($gameState->findPlayer('browser'));
+        $this->assertNotNull($gameState->findPlayer('remote'));
+    }
+
+    public function testConnectedPlayersStayInTheGame(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('browser'));
+        $gameState->trackPresence('browser');
+
+        $gameState->disconnectAbsentPlayers(['browser']);
+
+        $this->assertNotNull($gameState->findPlayer('browser'));
+    }
+
+    public function testDisconnectingFromARunningGameLeavesOnlyBots(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('browser'));
+        $gameState->addBot(new Bot);
+        $gameState->trackPresence('browser');
+        $gameState->setStatus(GameStatus::ACTIVE);
+
+        $gameState->disconnectAbsentPlayers([]);
+
+        $this->assertFalse($gameState->hasHumanPlayers());
+    }
+
+    public function testTrackingPresenceForSomeoneNotInTheGameThrows(): void
+    {
+        $gameState = new GameState(5);
+
+        $this->expectException(PlayerNotInGame::class);
+
+        $gameState->trackPresence('stranger');
     }
 }

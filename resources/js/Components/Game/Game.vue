@@ -61,6 +61,7 @@ const leaveGame = async () => {
   await axios.post(route('game.leave', { id: activeGame.value?.id }));
 
   window.Echo.leave('GameChannel-' + activeGame.value?.id);
+  window.Echo.leave('game.' + activeGame.value?.id);
 
   setActiveGame(null);
 }
@@ -90,6 +91,11 @@ const setActiveGame = (gameState) => {
         console.log('game updated', event);
         activeGame.value = event;
       });
+
+  // Being in this channel is how the server knows we're still connected.
+  if (gameState?.id) {
+    window.Echo.join('game.' + gameState.id);
+  }
 }
 
 const getActiveGame = async () => {
