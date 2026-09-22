@@ -73,16 +73,29 @@ trait PersistInCache
     }
 
     /**
-     * Remove a game from the active list under lock.
+     * Remove this game from the list of active games, keeping its state.
+     */
+    public function untrack(): void
+    {
+        static::removeFromList($this->getId());
+    }
+
+    /**
+     * Remove a game from the active list and delete its state.
      */
     public static function forget(string $id): void
+    {
+        static::removeFromList($id);
+
+        cache()->forget('game-'.$id);
+    }
+
+    protected static function removeFromList(string $id): void
     {
         Cache::lock('game_list-lock', static::$lockTtl)->block(static::$lockWait, function () use ($id) {
             $gameList = cache()->get('game_list', []);
             cache()->put('game_list', array_values(array_diff($gameList, [$id])));
         });
-
-        cache()->forget('game-'.$id);
     }
 
     /**

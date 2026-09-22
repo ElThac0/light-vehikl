@@ -2,6 +2,7 @@
 
 namespace App\GameObjects;
 
+use App\Events\GameEnded;
 use App\Events\GameUpdated;
 use App\Exceptions\GameAlreadyStarted;
 use App\Exceptions\GameFull;
@@ -206,11 +207,23 @@ class GameState
             }
         }
         $this->tick++;
-        if ($this->shouldEnd()) {
-            $this->setStatus(GameStatus::COMPLETE);
+        if (! $this->isOver() && $this->shouldEnd()) {
+            $this->end();
         }
 
         GameUpdated::dispatch($this);
+    }
+
+    /**
+     * Mark the game complete and drop it from the game list, so it stops
+     * ticking and lobby clients stop offering it.
+     */
+    public function end(): void
+    {
+        $this->setStatus(GameStatus::COMPLETE);
+        $this->untrack();
+
+        GameEnded::dispatch($this);
     }
 
     protected function movePlayer(Player $player): void

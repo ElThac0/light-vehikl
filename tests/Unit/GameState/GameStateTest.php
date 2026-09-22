@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\GameState;
 
+use App\Events\GameEnded;
 use App\Events\GameUpdated;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
@@ -165,4 +166,40 @@ class GameStateTest extends TestCase
         $this->assertFalse($gameState->isInGame($player2));
     }
 
+    public function testItEndsAndLeavesTheGameListWhenOnePlayerRemains(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('abc321'));
+        $gameState->track();
+        $gameState->nextTick();
+
+        $this->assertTrue($gameState->isOver());
+        $this->assertNotContains($gameState->getId(), GameState::list());
+        Event::assertDispatched(GameEnded::class, 1);
+    }
+
+    public function testItOnlyEndsOnce(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('abc321'));
+
+        $gameState->nextTick();
+        $gameState->nextTick();
+
+        Event::assertDispatchedTimes(GameEnded::class, 1);
+    }
+
+    public function testItDoesNotEndWhileTwoPlayersAreAlive(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer(new Player('abc321'));
+        $gameState->addPlayer(new Player('taco'));
+        $gameState->track();
+
+        $gameState->nextTick();
+
+        $this->assertFalse($gameState->isOver());
+        $this->assertContains($gameState->getId(), GameState::list());
+        Event::assertNotDispatched(GameEnded::class);
+    }
 }

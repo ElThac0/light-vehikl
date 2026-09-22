@@ -26,10 +26,15 @@ onBeforeMount(async () => {
       .listen('.game.created', (event) => {
         gameList.value = event.games
       })
+      .listen('.game.ended', (event) => {
+        gameList.value = event.games
+      })
 })
 
 onUnmounted(() => {
-  window.Echo.channel('GameChannel').stopListening('.game.created')
+  window.Echo.channel('GameChannel')
+      .stopListening('.game.created')
+      .stopListening('.game.ended')
 })
 
 async function joinGame(id) {
