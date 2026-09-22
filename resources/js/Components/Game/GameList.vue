@@ -11,13 +11,9 @@
 
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, onUnmounted, ref } from "vue";
 
 const emit = defineEmits(['joined-game']);
-const props = defineProps({
-  gameList: Array,
-  activeGame: Object,
-});
 
 const gameList = ref([])
 
@@ -32,12 +28,16 @@ onBeforeMount(async () => {
       })
 })
 
+onUnmounted(() => {
+  window.Echo.channel('GameChannel').stopListening('.game.created')
+})
+
 async function joinGame(id) {
   try {
     const response = await axios.post(route('game.join', id));
 
-    if (response.data?.id) {
-      emit('joined-game', response.data);
+    if (response.data?.gameState?.id) {
+      emit('joined-game', response.data.gameState);
     }
   } catch (e) {
     alert(`Couldn't join the game: ${e.response.data}`);

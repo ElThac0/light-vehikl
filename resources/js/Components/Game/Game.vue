@@ -116,7 +116,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <GameList :activeGame="activeGame" @joined-game="setActiveGame" class="py-1" />
+  <GameList v-if="!activeGame" @joined-game="setActiveGame" class="py-1" />
   <div class="flex gap-1">
     <PrimaryButton @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
     <PrimaryButton @click="addBot" v-if="activeGame">Add Bot</PrimaryButton>
