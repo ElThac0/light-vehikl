@@ -1,9 +1,10 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import GameList from "@/Components/Game/GameList.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Players from "@/Components/Game/Players.vue";
 import GameBoard from "@/Components/Game/GameBoard.vue";
+import GameBoardWebGL from "@/Components/Game/GameBoardWebGL.vue";
 import PlayerName from "@/Components/Game/PlayerName.vue";
 
 const props = defineProps({
@@ -11,6 +12,23 @@ const props = defineProps({
 });
 
 const name = ref(props.playerName);
+
+// Which board to draw with; remembered per browser. Storage can be
+// unavailable (e.g. private browsing), so fall back to the HTML board.
+const RENDER_MODE_KEY = 'render-mode';
+const readRenderMode = () => {
+  try {
+    return localStorage.getItem(RENDER_MODE_KEY) === 'webgl' ? 'webgl' : 'html';
+  } catch {
+    return 'html';
+  }
+}
+const renderMode = ref(readRenderMode());
+watch(renderMode, (mode) => {
+  try {
+    localStorage.setItem(RENDER_MODE_KEY, mode);
+  } catch {}
+});
 
 const activeGame = ref(null);
 const players = computed(() => activeGame.value?.players);
@@ -140,8 +158,18 @@ onMounted(async () => {
       <Players :players="players" />
     </div>
     <div v-if="activeGame" class="w-2/3">
-      <h2>In Game: {{ activeGame?.id }}</h2>
-      <GameBoard :arena-size="arenaSize" :board="board" :players="players"/>
+      <div class="flex justify-between items-center gap-2 mb-2">
+        <h2>In Game: {{ activeGame?.id }}</h2>
+        <label class="flex items-center gap-2 text-sm">
+          Render mode
+          <select v-model="renderMode" class="border border-gray-300 rounded py-1 pl-2 pr-8 text-sm text-black">
+            <option value="html">HTML</option>
+            <option value="webgl">Graphical (WebGL)</option>
+          </select>
+        </label>
+      </div>
+      <GameBoardWebGL v-if="renderMode === 'webgl'" :arena-size="arenaSize" :board="board" :players="players"/>
+      <GameBoard v-else :arena-size="arenaSize" :board="board" :players="players"/>
     </div>
   </div>
 
