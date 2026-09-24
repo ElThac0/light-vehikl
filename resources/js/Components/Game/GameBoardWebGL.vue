@@ -1,5 +1,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { CRASHED_COLOR, PLAYER_COLORS, toRgb } from "./playerColors.js";
+import { createProgram } from "./webgl.js";
 
 // Same props as GameBoard.vue, so the two can be swapped freely.
 const props = defineProps({
@@ -41,18 +43,19 @@ uniform sampler2D u_board;
 uniform float u_size;
 uniform float u_cellPixels;
 uniform vec4 u_crashed;
+uniform vec3 u_playerColors[4];
+uniform vec3 u_crashedColor;
 
 const vec3 BACKGROUND = vec3(0.02, 0.02, 0.07);
 const vec3 GRID = vec3(0.0, 0.0, 0.5);
 const vec3 WALL = vec3(0.45, 0.45, 0.5);
-const vec3 CRASHED = vec3(1.0, 0.0, 0.0);
 
-// Player colours from Tile.vue: lime, #00eaff, #2563eb, orange.
+// WebGL 1 fragment shaders can't index uniform arrays with a variable.
 vec3 playerColor(float player) {
-  if (player < 0.5) return vec3(0.0, 1.0, 0.0);
-  if (player < 1.5) return vec3(0.0, 0.918, 1.0);
-  if (player < 2.5) return vec3(0.145, 0.388, 0.922);
-  return vec3(1.0, 0.647, 0.0);
+  if (player < 0.5) return u_playerColors[0];
+  if (player < 1.5) return u_playerColors[1];
+  if (player < 2.5) return u_playerColors[2];
+  return u_playerColors[3];
 }
 
 float playerCrashed(float player) {
@@ -75,7 +78,7 @@ void main() {
     vec3 base = playerColor(player);
 
     if (head && playerCrashed(player) > 0.5) {
-      color = CRASHED;
+      color = u_crashedColor;
     } else if (head) {
       // A brighter core so each rider stands out from their trail.
       color = mix(base, vec3(1.0), 0.45);
@@ -98,18 +101,6 @@ void main() {
 }
 `;
 
-const compile = (type, source) => {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error(gl.getShaderInfoLog(shader));
-  }
-
-  return shader;
-}
-
 const init = () => {
   gl = canvas.value.getContext('webgl', { antialias: false });
 
@@ -118,15 +109,7 @@ const init = () => {
     return;
   }
 
-  program = gl.createProgram();
-  gl.attachShader(program, compile(gl.VERTEX_SHADER, VERTEX_SHADER));
-  gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAGMENT_SHADER));
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    throw new Error(gl.getProgramInfoLog(program));
-  }
-
+  program = createProgram(gl, VERTEX_SHADER, FRAGMENT_SHADER);
   gl.useProgram(program);
 
   // Two triangles covering the whole canvas.
@@ -147,9 +130,11 @@ const init = () => {
   // Rows are one byte per tile, so they aren't 4-byte aligned.
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
-  uniforms = Object.fromEntries(['u_board', 'u_size', 'u_cellPixels', 'u_crashed']
+  uniforms = Object.fromEntries(['u_board', 'u_size', 'u_cellPixels', 'u_crashed', 'u_playerColors', 'u_crashedColor']
     .map((name) => [name, gl.getUniformLocation(program, name)]));
   gl.uniform1i(uniforms.u_board, 0);
+  gl.uniform3fv(uniforms.u_playerColors, PLAYER_COLORS.flatMap(toRgb));
+  gl.uniform3fv(uniforms.u_crashedColor, toRgb(CRASHED_COLOR));
 }
 
 const draw = () => {
@@ -175,7 +160,8 @@ const draw = () => {
 const resize = () => {
   const pixels = Math.round(canvas.value.clientWidth * window.devicePixelRatio);
 
-  if (pixels > 0 && canvas.value.width !== pixels) {
+  // Check both sides: a new canvas is 300x150, so width alone can already match.
+  if (pixels > 0 && (canvas.value.width !== pixels || canvas.value.height !== pixels)) {
     canvas.value.width = canvas.value.height = pixels;
   }
 

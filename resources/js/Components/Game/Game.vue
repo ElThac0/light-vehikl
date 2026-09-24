@@ -5,6 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Players from "@/Components/Game/Players.vue";
 import GameBoard from "@/Components/Game/GameBoard.vue";
 import GameBoardWebGL from "@/Components/Game/GameBoardWebGL.vue";
+import GameBoard3D from "@/Components/Game/GameBoard3D.vue";
 import PlayerName from "@/Components/Game/PlayerName.vue";
 
 const props = defineProps({
@@ -16,9 +17,11 @@ const name = ref(props.playerName);
 // Which board to draw with; remembered per browser. Storage can be
 // unavailable (e.g. private browsing), so fall back to the HTML board.
 const RENDER_MODE_KEY = 'render-mode';
+const RENDER_MODES = ['html', 'webgl', '3d'];
 const readRenderMode = () => {
   try {
-    return localStorage.getItem(RENDER_MODE_KEY) === 'webgl' ? 'webgl' : 'html';
+    const mode = localStorage.getItem(RENDER_MODE_KEY);
+    return RENDER_MODES.includes(mode) ? mode : 'html';
   } catch {
     return 'html';
   }
@@ -165,10 +168,12 @@ onMounted(async () => {
           <select v-model="renderMode" class="border border-gray-300 rounded py-1 pl-2 pr-8 text-sm text-black">
             <option value="html">HTML</option>
             <option value="webgl">Graphical (WebGL)</option>
+            <option value="3d">3D (WebGL)</option>
           </select>
         </label>
       </div>
-      <GameBoardWebGL v-if="renderMode === 'webgl'" :arena-size="arenaSize" :board="board" :players="players"/>
+      <GameBoard3D v-if="renderMode === '3d'" :arena-size="arenaSize" :board="board" :players="players"/>
+      <GameBoardWebGL v-else-if="renderMode === 'webgl'" :arena-size="arenaSize" :board="board" :players="players"/>
       <GameBoard v-else :arena-size="arenaSize" :board="board" :players="players"/>
     </div>
   </div>

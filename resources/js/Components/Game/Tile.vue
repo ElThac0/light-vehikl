@@ -1,6 +1,8 @@
 <script setup>
 
 import { computed } from "vue";
+// Defines the --player-*-color variables used below.
+import "./playerColors.js";
 
 const props = defineProps({
   contents: Number,
@@ -53,22 +55,22 @@ const crashed = computed(() => {
 }
 
 .player-1 {
-  background-color: lime;
+  background-color: var(--player-1-color);
 }
 
 .player-2 {
-  background-color: #00eaff;
+  background-color: var(--player-2-color);
 }
 
 .player-3 {
-  background-color: #2563eb;
+  background-color: var(--player-3-color);
 }
 
 .player-4 {
-  background-color: orange;
+  background-color: var(--player-4-color);
 }
 
 .crashed {
-  background-color: red;
+  background-color: var(--player-crashed-color);
 }
 </style>
