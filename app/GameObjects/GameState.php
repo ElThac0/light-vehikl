@@ -122,7 +122,7 @@ class GameState
      *
      * @throws GameOver|GameAlreadyStarted|GameFull|PlayerAlreadyInGame
      */
-    public function join(string $playerId): Player
+    public function join(string $playerId, ?string $name = null): Player
     {
         if ($existing = $this->findPlayer($playerId)) {
             return $existing;
@@ -137,6 +137,10 @@ class GameState
         }
 
         $player = new Player($playerId);
+
+        if ($name !== null) {
+            $player->setName($name);
+        }
 
         $this->addPlayer($player);
 
@@ -279,6 +283,12 @@ class GameState
         $coords = $start->tile->getCoords();
         $playerEnum = $start->playerType;
         $player->setSlot($playerEnum);
+
+        // Never fall back to showing the id, which for humans is their session id.
+        if (! $this->hasName($player)) {
+            $player->setName('Player '.$this->slotNumber($playerEnum));
+        }
+
         $this->players[$playerEnum->value] = $player->setLocation($coords)->setDirection($start->direction);
 
         $start->tile->setContents($playerEnum);
@@ -293,8 +303,28 @@ class GameState
      */
     public function addBot(Bot $bot): void
     {
-        $position = $this->addPlayer($bot->getPlayer()->setStatus(PlayerStatus::READY));
+        $player = $bot->getPlayer();
+        $named = $this->hasName($player);
+
+        $position = $this->addPlayer($player->setStatus(PlayerStatus::READY));
         $this->bots[$position->value] = $bot;
+
+        if (! $named) {
+            $player->setName('Bot '.$this->slotNumber($position));
+        }
+    }
+
+    /**
+     * Player falls back to its id when no name has been set.
+     */
+    protected function hasName(Player $player): bool
+    {
+        return $player->getName() !== $player->getId();
+    }
+
+    protected function slotNumber(ContentType $slot): int
+    {
+        return intdiv($slot->value, 2);
     }
 
     public function nextTick(): void
@@ -363,6 +393,7 @@ class GameState
         return collect($this->players)
             ->map(fn (Player $player, int $slot) => [
                 ...$player->jsonSerialize(),
+                'name' => $player->getName(),
                 'isBot' => isset($this->bots[$slot]),
             ])
             ->values()

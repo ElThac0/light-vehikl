@@ -12,9 +12,9 @@ defineProps({
         type: String,
         required: true,
     },
-    sessionId: {
+    playerName: {
         type: String,
-    }
+    },
 });
 </script>
 
@@ -28,7 +28,7 @@ defineProps({
               <HeaderNav />
 
                 <main class="mt-6">
-                  <Game :sessionId="sessionId" />
+                  <Game :playerName="playerName" />
                 </main>
 
                 <footer class="py-16 text-center text-sm text-black dark:text-white/70">

@@ -11,7 +11,7 @@ const props = defineProps({
   <div class="font-bold text-lg">Players</div>
   <ul>
     <li v-for="player in players" :key="`player-${player.id}`" class="py-2 border-b border-gray-200">
-      {{ player.id }}
+      {{ player.name }}
       <span v-if="player.isBot" class="ml-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-xs font-bold uppercase">
         Bot
       </span>

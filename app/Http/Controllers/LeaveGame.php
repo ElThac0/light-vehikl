@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\GameNotFound;
 use App\Exceptions\PlayerNotInGame;
 use App\GameObjects\GameState;
+use App\Support\SessionPlayer;
 use Illuminate\Http\Request;
 
 class LeaveGame extends Controller
@@ -14,7 +15,7 @@ class LeaveGame extends Controller
         $request->session()->remove('active_game');
 
         try {
-            $game = GameState::mutate($id, fn (GameState $gameState) => $gameState->leave($request->session()->getId()));
+            $game = GameState::mutate($id, fn (GameState $gameState) => $gameState->leave(SessionPlayer::id($request->session())));
         } catch (GameNotFound|PlayerNotInGame) {
             return response()->json('ok');
         }

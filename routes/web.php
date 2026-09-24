@@ -1,14 +1,14 @@
 <?php
 
-use App\GameObjects\GameState;
 use App\Http\Controllers\AddBot;
-use App\Http\Controllers\GameList;
-use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\CreateGame;
+use App\Http\Controllers\GameList;
 use App\Http\Controllers\GameMove;
 use App\Http\Controllers\GetGame;
+use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\LeaveGame;
 use App\Http\Controllers\MarkReady;
+use App\Http\Controllers\SetPlayerName;
 use App\Http\Controllers\StartGame;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -19,9 +19,11 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
-        'sessionId' => session()->id(),
+        'playerName' => session('player_name'),
     ]);
 });
+
+Route::post('/player-name', SetPlayerName::class)->name('player.name');
 
 Route::withoutMiddleware([ValidateCsrfToken::class])->group(function () {
     Route::post('/games', CreateGame::class)->name('game.create');

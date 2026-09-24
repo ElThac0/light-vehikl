@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\GameCreated;
 use App\GameObjects\GameState;
+use App\Support\SessionPlayer;
 use Illuminate\Http\Request;
 use LightVehikl\LvObjects\GameObjects\Player;
 
@@ -14,7 +15,11 @@ class CreateGame extends Controller
     public function __invoke(Request $request)
     {
         $gameState = new GameState(self::ARENA_SIZE);
-        $player = new Player($request->session()->getId());
+        $player = new Player(SessionPlayer::id($request->session()));
+
+        if ($name = $request->session()->get('player_name')) {
+            $player->setName($name);
+        }
 
         $gameState->addPlayer($player);
         $request->session()->put('active_game', $gameState->getId());

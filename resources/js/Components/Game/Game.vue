@@ -4,10 +4,13 @@ import GameList from "@/Components/Game/GameList.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Players from "@/Components/Game/Players.vue";
 import GameBoard from "@/Components/Game/GameBoard.vue";
+import PlayerName from "@/Components/Game/PlayerName.vue";
 
 const props = defineProps({
-  sessionId: String,
+  playerName: String,
 });
+
+const name = ref(props.playerName);
 
 const activeGame = ref(null);
 const players = computed(() => activeGame.value?.players);
@@ -122,9 +125,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <GameList v-if="!activeGame" @joined-game="setActiveGame" class="py-1" />
+  <PlayerName v-if="!activeGame" :name="name" @saved="name = $event" />
+  <GameList v-if="!activeGame && name" @joined-game="setActiveGame" class="py-1" />
   <div class="flex gap-1">
-    <PrimaryButton @click="createGame" v-if="!activeGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
+    <PrimaryButton @click="createGame" v-if="!activeGame && name" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
     <PrimaryButton @click="addBot" v-if="activeGame && activeGame.status === 'waiting'">Add Bot</PrimaryButton>
     <PrimaryButton @click="leaveGame" v-if="activeGame">Leave Game</PrimaryButton>
     <PrimaryButton @click="startGame" v-if="activeGame && activeGame.status === 'waiting'">Start Game</PrimaryButton>
