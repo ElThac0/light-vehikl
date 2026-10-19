@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use LightVehikl\LvObjects\Enums\PersonalityType;
 use LightVehikl\LvObjects\GameObjects\Player;
 use Tests\TestCase;
 use App\GameObjects\GameState;
@@ -50,5 +51,21 @@ class BotTest extends TestCase
 
         $this->assertEquals(1, $gameState->getPlayers()->count());
         $this->assertSame($bot->getPlayer(), $restored->getPlayers()->first());
+    }
+
+    function testEveryPersonalityTypeCanDriveABot(): void
+    {
+        Event::fake();
+
+        foreach (PersonalityType::cases() as $personalityType) {
+            $gameState = new GameState(5);
+            $bot = new Bot(null, $personalityType);
+            $gameState->addBot($bot);
+            $start = $bot->getPlayer()->getLocation();
+
+            $gameState->nextTick();
+
+            $this->assertNotEquals($start, $bot->getPlayer()->getLocation(), $personalityType->name);
+        }
     }
 }

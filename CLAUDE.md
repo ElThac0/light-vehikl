@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A Laravel 13 + Inertia (Vue 3) app implementing a real-time multiplayer "light cycle" / Tron-style grid game. Players join a game, move around an arena leaving trails, and crash if they hit a wall or trail. Game state updates are pushed to clients over WebSockets (Laravel Reverb).
 
-Core game domain objects (`Arena`, `Player`, `Bot`, `Tile`, `StartLocation`, and enums like `ContentType`, `Direction`, `GameStatus`, `PlayerStatus`) live in an external package, `light-vehikl/lvobjects` (namespace `LightVehikl\LvObjects\...`), pulled from a git repo (see `composer.json` repositories / `composer.lock`), not from this repo. When you need to see how those objects behave, look in `vendor/light-vehikl/lvobjects`.
+Core game domain objects (`Arena`, `Player`, `Bot`, `Tile`, `StartLocation`, the bot `Personality` classes, and enums like `ContentType`, `Direction`, `GameStatus`, `PlayerStatus`, `PersonalityType`) live in an external package, `light-vehikl/lvobjects` (namespace `LightVehikl\LvObjects\...`), pulled from a git repo (see `composer.json` repositories / `composer.lock`), not from this repo. When you need to see how those objects behave, look in `vendor/light-vehikl/lvobjects`.
 
 ## Commands
 
@@ -35,7 +35,7 @@ Game progression ("ticks") happen in two different places, so check both when to
 - `App\Providers\GameServiceProvider` registers an `Octane::tick(...)` callback that does the same thing every second — **but this provider is not currently registered in `bootstrap/providers.php`**, so it does not run. Be aware of this discrepancy if game ticking behavior seems inconsistent with what the code implies.
 - `App\Console\Commands\RunGameCommand` (`run:game {gameId}`) is a standalone command that drives a single game to completion in a loop, independent of the schedule.
 
-`GameState::nextTick()` updates bots first (`Personality` classes in `app/GameObjects/Personalities/` decide bot moves), then moves every non-crashed player, checks `shouldEnd()` (game ends when ≤1 player remains uncrashed), and dispatches `App\Events\GameUpdated` after every mutation.
+`GameState::nextTick()` updates bots first (`Personality` classes from the `lvobjects` package, selected via the `PersonalityType` enum, decide bot moves), then moves every non-crashed player, checks `shouldEnd()` (game ends when ≤1 player remains uncrashed), and dispatches `App\Events\GameUpdated` after every mutation.
 
 ### Real-time updates
 Broadcasting uses Reverb (`config/reverb.php`, `config/broadcasting.php`). `App\Broadcasting\GameChannel` defines the per-game channel; `App\Events\GameCreated`, `GameUpdated`, `PlayerJoined` broadcast state changes. Frontend subscribes via `window.Echo` (`resources/js/echo.js`, configured for the `reverb` broadcaster) — see `resources/js/Components/Game/Game.vue` for the channel-join / listen pattern (`GameChannel-{gameId}`, `.game.updated` event).
