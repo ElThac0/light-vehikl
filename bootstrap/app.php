@@ -13,14 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withBroadcasting(__DIR__.'/../routes/channels.php', [
         'middleware' => ['web', \App\Http\Middleware\ResolveSessionPlayer::class],
-    ])
-    ->withMiddleware(function (Middleware $middleware) {
+    ])->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+        ])->preventRequestForgery(except: [
+            'join-game/*',
+            'mark-ready/*',
+            'game/*/move',
         ]);
-
-        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
