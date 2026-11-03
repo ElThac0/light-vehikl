@@ -8,6 +8,7 @@ use App\Http\Controllers\GetGame;
 use App\Http\Controllers\JoinGame;
 use App\Http\Controllers\LeaveGame;
 use App\Http\Controllers\MarkReady;
+use App\Http\Controllers\ObserveGame;
 use App\Http\Controllers\SetPlayerName;
 use App\Http\Controllers\StartGame;
 use Illuminate\Foundation\Application;
@@ -33,6 +34,7 @@ Route::withoutMiddleware([ValidateCsrfToken::class])->group(function () {
     Route::post('/game/{id}/move', GameMove::class)->name('game.move');
 
     Route::post('/join-game/{id}', JoinGame::class)->name('game.join')->withoutMiddleware([ValidateCsrfToken::class]);
+    Route::get('/observe-game/{id}', ObserveGame::class)->name('game.observe');
     Route::post('/add-bot/{id}', AddBot::class)->name('game.add-bot');
     Route::post('/leave-game/{id}', LeaveGame::class)->name('game.leave');
     Route::post('/mark-ready/{id}', MarkReady::class)->name('game.mark-ready');

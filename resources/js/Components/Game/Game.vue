@@ -34,6 +34,8 @@ watch(renderMode, (mode) => {
 });
 
 const activeGame = ref(null);
+// Observers get the game's updates but aren't players in it.
+const observing = ref(false);
 const players = computed(() => activeGame.value?.players);
 const board = computed(() => activeGame.value?.tiles);
 const arenaSize = computed(() => activeGame.value?.arenaSize);
@@ -60,7 +62,7 @@ const handleKeyPress = (e) => {
       break;
   }
 
-  if (direction && activeGame.value?.id) {
+  if (direction && activeGame.value?.id && !observing.value) {
     axios.post(route('game.move', { id: activeGame.value.id }), { direction });
   }
 }
@@ -90,6 +92,18 @@ const leaveGame = async () => {
   setActiveGame(null);
 }
 
+const watchGame = (gameState) => {
+  observing.value = true;
+  setActiveGame(gameState);
+}
+
+const stopWatching = () => {
+  window.Echo.leave('GameChannel-' + activeGame.value?.id);
+
+  observing.value = false;
+  activeGame.value = null;
+}
+
 const startGame = async () => {
   try {
     await axios.post(route('game.start', {id: activeGame.value?.id}));
@@ -117,7 +131,7 @@ const setActiveGame = (gameState) => {
       });
 
   // Being in this channel is how the server knows we're still connected.
-  if (gameState?.id) {
+  if (gameState?.id && !observing.value) {
     window.Echo.join('game.' + gameState.id);
   }
 }
@@ -147,13 +161,16 @@ onMounted(async () => {
 
 <template>
   <PlayerName v-if="!activeGame" :name="name" @saved="name = $event" />
-  <GameList v-if="!activeGame && name" @joined-game="setActiveGame" class="py-1" />
+  <GameList v-if="!activeGame && name" @joined-game="setActiveGame" @watching-game="watchGame" class="py-1" />
   <div class="flex gap-1">
     <PrimaryButton @click="createGame" v-if="!activeGame && name" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
-    <PrimaryButton @click="addBot" v-if="activeGame && activeGame.status === 'waiting'">Add Bot</PrimaryButton>
-    <PrimaryButton @click="leaveGame" v-if="activeGame">Leave Game</PrimaryButton>
-    <PrimaryButton @click="startGame" v-if="activeGame && activeGame.status === 'waiting'">Start Game</PrimaryButton>
-    <PrimaryButton @click="markReady" v-if="activeGame && activeGame.status === 'waiting'">Mark Ready</PrimaryButton>
+    <template v-if="activeGame && !observing">
+      <PrimaryButton @click="addBot" v-if="activeGame.status === 'waiting'">Add Bot</PrimaryButton>
+      <PrimaryButton @click="leaveGame">Leave Game</PrimaryButton>
+      <PrimaryButton @click="startGame" v-if="activeGame.status === 'waiting'">Start Game</PrimaryButton>
+      <PrimaryButton @click="markReady" v-if="activeGame.status === 'waiting'">Mark Ready</PrimaryButton>
+    </template>
+    <PrimaryButton @click="stopWatching" v-if="activeGame && observing">Stop Watching</PrimaryButton>
   </div>
 
   <div class="flex gap-8">
@@ -162,7 +179,7 @@ onMounted(async () => {
     </div>
     <div v-if="activeGame" class="w-2/3">
       <div class="flex justify-between items-center gap-2 mb-2">
-        <h2>In Game: {{ activeGame?.id }}</h2>
+        <h2>{{ observing ? 'Watching Game' : 'In Game' }}: {{ activeGame?.id }}</h2>
         <label class="flex items-center gap-2 text-sm">
           Render mode
           <select v-model="renderMode" class="border border-gray-300 rounded py-1 pl-2 pr-8 text-sm text-black">

@@ -4,6 +4,9 @@
       <PrimaryButton @click="joinGame(game)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Join Game
       </PrimaryButton>
+      <PrimaryButton @click="watchGame(game)" class="ml-1">
+        Watch
+      </PrimaryButton>
       {{ game }}
     </li>
   </ol>
@@ -13,7 +16,7 @@
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { onBeforeMount, onUnmounted, ref } from "vue";
 
-const emit = defineEmits(['joined-game']);
+const emit = defineEmits(['joined-game', 'watching-game']);
 
 const gameList = ref([])
 
@@ -50,6 +53,18 @@ async function joinGame(id) {
     }
   } catch (e) {
     alert(`Couldn't join the game: ${e.response.data}`);
+  }
+}
+
+async function watchGame(id) {
+  try {
+    const response = await axios.get(route('game.observe', id));
+
+    if (response.data?.gameState?.id) {
+      emit('watching-game', response.data.gameState);
+    }
+  } catch (e) {
+    alert(`Couldn't watch the game: ${e.response.data}`);
   }
 }
 </script>
