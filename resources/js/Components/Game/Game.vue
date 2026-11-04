@@ -7,6 +7,7 @@ import GameBoard from "@/Components/Game/GameBoard.vue";
 import GameBoardWebGL from "@/Components/Game/GameBoardWebGL.vue";
 import GameBoard3D from "@/Components/Game/GameBoard3D.vue";
 import PlayerName from "@/Components/Game/PlayerName.vue";
+import errorMessage from "@/errorMessage";
 
 const props = defineProps({
   playerName: String,
@@ -108,7 +109,7 @@ const startGame = async () => {
   try {
     await axios.post(route('game.start', {id: activeGame.value?.id}));
   } catch (e) {
-    alert(`Error starting game - ${e.response?.data}`)
+    alert(`Error starting game - ${errorMessage(e)}`)
   }
 }
 
@@ -117,7 +118,7 @@ const markReady = async () => {
     await axios.post(route('game.mark-ready', {id: activeGame.value.id}));
   } catch (e) {
     console.log('oops', e)
-    alert(`Marking ready failed - ${e.response?.data}`);
+    alert(`Marking ready failed - ${errorMessage(e)}`);
   }
 };
 

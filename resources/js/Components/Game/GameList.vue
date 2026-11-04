@@ -15,6 +15,7 @@
 <script setup>
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { onBeforeMount, onUnmounted, ref } from "vue";
+import errorMessage from "@/errorMessage";
 
 const emit = defineEmits(['joined-game', 'watching-game']);
 
@@ -52,7 +53,7 @@ async function joinGame(id) {
       emit('joined-game', response.data.gameState);
     }
   } catch (e) {
-    alert(`Couldn't join the game: ${e.response.data}`);
+    alert(`Couldn't join the game: ${errorMessage(e)}`);
   }
 }
 
@@ -64,7 +65,7 @@ async function watchGame(id) {
       emit('watching-game', response.data.gameState);
     }
   } catch (e) {
-    alert(`Couldn't watch the game: ${e.response.data}`);
+    alert(`Couldn't watch the game: ${errorMessage(e)}`);
   }
 }
 </script>
