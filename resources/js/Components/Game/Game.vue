@@ -8,6 +8,7 @@ import GameBoardWebGL from "@/Components/Game/GameBoardWebGL.vue";
 import GameBoard3D from "@/Components/Game/GameBoard3D.vue";
 import PlayerName from "@/Components/Game/PlayerName.vue";
 import errorMessage from "@/errorMessage";
+import { playerColor } from "@/Components/Game/playerColors.js";
 
 const props = defineProps({
   playerName: String,
@@ -41,6 +42,10 @@ const players = computed(() => activeGame.value?.players);
 const board = computed(() => activeGame.value?.tiles);
 const arenaSize = computed(() => activeGame.value?.arenaSize);
 const gameStatus = computed(() => activeGame.value?.status);
+// Once the game is over, the last player still riding (if any) has won.
+const winner = computed(() => gameStatus.value === 'complete'
+    ? players.value?.find((player) => player.status !== 'crashed') ?? null
+    : undefined);
 
 const addPlayer = (player) => {
   players.value.push(player);
@@ -204,9 +209,19 @@ onMounted(async () => {
           </select>
         </label>
       </div>
-      <GameBoard3D v-if="renderMode === '3d'" :arena-size="arenaSize" :board="board" :players="players"/>
-      <GameBoardWebGL v-else-if="renderMode === 'webgl'" :arena-size="arenaSize" :board="board" :players="players"/>
-      <GameBoard v-else :arena-size="arenaSize" :board="board" :players="players"/>
+      <div class="relative max-w-[75vh] mx-auto">
+        <GameBoard3D v-if="renderMode === '3d'" :arena-size="arenaSize" :board="board" :players="players"/>
+        <GameBoardWebGL v-else-if="renderMode === 'webgl'" :arena-size="arenaSize" :board="board" :players="players"/>
+        <GameBoard v-else :arena-size="arenaSize" :board="board" :players="players"/>
+        <div v-if="gameStatus === 'complete'" class="absolute inset-0 flex items-center justify-center bg-black/60 pointer-events-none">
+          <p class="text-4xl font-bold text-white drop-shadow-lg">
+            <template v-if="winner">
+              <span :style="{ color: playerColor(winner.slot) }">{{ winner.name }}</span> wins!
+            </template>
+            <template v-else>Everyone crashed!</template>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
