@@ -76,6 +76,19 @@ const createGame = async () => {
   }
 }
 
+// Create an empty game and watch it, leaving every slot open for others.
+const createAndWatchGame = async () => {
+  try {
+    const response = await axios.post(route('game.create'), { spectate: true });
+
+    if (response.data?.id) {
+      watchGame(response.data);
+    }
+  } catch (e) {
+    alert(`Couldn't create the game: ${errorMessage(e)}`);
+  }
+}
+
 const addBot = async () => {
   const response = await axios.post(route('game.add-bot', { id: activeGame.value?.id }));
 
@@ -165,6 +178,7 @@ onMounted(async () => {
   <GameList v-if="!activeGame && name" @joined-game="setActiveGame" @watching-game="watchGame" class="py-1" />
   <div class="flex gap-1">
     <PrimaryButton @click="createGame" v-if="!activeGame && name" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
+    <PrimaryButton @click="createAndWatchGame" v-if="!activeGame && name">Create &amp; Watch</PrimaryButton>
     <template v-if="activeGame && !observing">
       <PrimaryButton @click="addBot" v-if="activeGame.status === 'waiting'">Add Bot</PrimaryButton>
       <PrimaryButton @click="leaveGame">Leave Game</PrimaryButton>

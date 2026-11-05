@@ -15,14 +15,18 @@ class CreateGame extends Controller
     public function __invoke(Request $request)
     {
         $gameState = new GameState(self::ARENA_SIZE);
-        $player = new Player(SessionPlayer::id($request->session()));
 
-        if ($name = $request->session()->get('player_name')) {
-            $player->setName($name);
+        // Spectating creators leave the game empty for others to join.
+        if (! $request->boolean('spectate')) {
+            $player = new Player(SessionPlayer::id($request->session()));
+
+            if ($name = $request->session()->get('player_name')) {
+                $player->setName($name);
+            }
+
+            $gameState->addPlayer($player);
+            $request->session()->put('active_game', $gameState->getId());
         }
-
-        $gameState->addPlayer($player);
-        $request->session()->put('active_game', $gameState->getId());
 
         $gameState->save();
         $gameState->track();
