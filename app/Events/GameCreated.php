@@ -8,7 +8,6 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 
 class GameCreated implements ShouldBroadcast
 {
@@ -33,9 +32,6 @@ class GameCreated implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        $gameList = Cache::remember('game_list', 3600, function () {
-            return [];
-        });
-        return ['games' => $gameList];
+        return ['games' => GameState::summaries()];
     }
 }

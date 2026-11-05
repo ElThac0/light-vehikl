@@ -9,8 +9,6 @@ class GameList extends Controller
 {
     public function __invoke(Request $request)
     {
-        $gameList = GameState::list();
-
-        return response()->json($gameList);
+        return response()->json(GameState::summaries());
     }
 }

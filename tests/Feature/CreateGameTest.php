@@ -46,4 +46,25 @@ class CreateGameTest extends TestCase
 
         $this->assertCount(1, GameState::find($id)->getPlayers());
     }
+
+    public function test_the_game_list_shows_who_created_each_game(): void
+    {
+        $id = $this->withSession(['player_name' => 'Ada'])
+            ->postJson(route('game.create'), ['spectate' => true])
+            ->json('id');
+
+        $this->assertSame('Ada', GameState::find($id)->getCreatedBy());
+
+        $this->getJson(route('game.list'))
+            ->assertOk()
+            ->assertExactJson([['id' => $id, 'createdBy' => 'Ada']]);
+    }
+
+    public function test_the_game_list_skips_games_whose_state_is_gone(): void
+    {
+        $game = new GameState(5);
+        $game->track();
+
+        $this->getJson(route('game.list'))->assertExactJson([]);
+    }
 }

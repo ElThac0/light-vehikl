@@ -1,13 +1,13 @@
 <template>
   <ol>
-    <li v-for="game in gameList" class="py-1">
-      <PrimaryButton @click="joinGame(game)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    <li v-for="game in gameList" :key="game.id" class="py-1">
+      <PrimaryButton @click="joinGame(game.id)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Join Game
       </PrimaryButton>
-      <PrimaryButton @click="watchGame(game)" class="ml-1">
+      <PrimaryButton @click="watchGame(game.id)" class="ml-1">
         Watch
       </PrimaryButton>
-      {{ game }}
+      <span class="ml-1">{{ game.createdBy ? `${game.createdBy}'s game` : 'Unnamed game' }}</span>
     </li>
   </ol>
 </template>

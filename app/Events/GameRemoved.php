@@ -34,7 +34,7 @@ class GameRemoved implements ShouldBroadcast
     {
         return [
             'id' => $this->game->getId(),
-            'games' => GameState::list(),
+            'games' => GameState::summaries(),
         ];
     }
 }

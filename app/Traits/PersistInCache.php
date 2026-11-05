@@ -99,7 +99,23 @@ trait PersistInCache
     }
 
     /**
-     * @return GameState[]
+     * Summaries of every active game, for the lobby's game list.
+     *
+     * @return array<array{id: string, createdBy: ?string}>
+     */
+    public static function summaries(): array
+    {
+        return collect(static::list())
+            ->map(fn (string $id) => static::find($id)?->toSummary())
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Ids of every active game.
+     *
+     * @return array<string>
      */
     public static function list(): array
     {

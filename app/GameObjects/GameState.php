@@ -56,6 +56,9 @@ class GameState
 
     public Carbon $createdAt;
 
+    /** Name of the player who created the game, shown in the lobby. */
+    protected ?string $createdBy = null;
+
     public function __construct(protected int $arenaSize, $id = null)
     {
         $this->arena = new Arena($arenaSize);
@@ -264,6 +267,29 @@ class GameState
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getCreatedBy(): ?string
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?string $name): self
+    {
+        $this->createdBy = $name;
+
+        return $this;
+    }
+
+    /**
+     * What the lobby needs to show a game in its list.
+     */
+    public function toSummary(): array
+    {
+        return [
+            'id' => $this->id,
+            'createdBy' => $this->createdBy,
+        ];
     }
 
     /**
