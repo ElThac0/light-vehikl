@@ -12,6 +12,7 @@ use App\Http\Controllers\ObserveGame;
 use App\Http\Controllers\SetPlayerName;
 use App\Http\Controllers\StartGame;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,9 +25,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::post('/player-name', SetPlayerName::class)->name('player.name');
 
-Route::withoutMiddleware([ValidateCsrfToken::class])->group(function () {
+Route::withoutMiddleware([PreventRequestForgery::class])->group(function () {
+    Route::post('/player-name', SetPlayerName::class)->name('player.name');
     Route::post('/games', CreateGame::class)->name('game.create');
     Route::get('/games', GameList::class)->name('game.list');
     Route::post('/game/{id}/start', StartGame::class)->name('game.start');
