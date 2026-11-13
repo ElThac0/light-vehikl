@@ -4,6 +4,7 @@ namespace Tests\Unit\GameState;
 
 use App\Events\GameEnded;
 use App\Events\GameUpdated;
+use App\Exceptions\GameNotStartable;
 use App\Exceptions\PlayerNotInGame;
 use App\GameObjects\GameState;
 use Illuminate\Support\Facades\Event;
@@ -190,6 +191,38 @@ class GameStateTest extends TestCase
         $gameState->nextTick();
 
         Event::assertDispatchedTimes(GameEnded::class, 1);
+    }
+
+    public function testItCanStartWithTwoReadyPlayers(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer((new Player('abc321'))->setStatus(PlayerStatus::READY));
+        $gameState->addPlayer((new Player('taco'))->setStatus(PlayerStatus::READY));
+
+        $gameState->ensureStartable();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testItCannotStartWithOnePlayer(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer((new Player('solo'))->setStatus(PlayerStatus::READY));
+
+        $this->expectExceptionObject(GameNotStartable::notEnoughPlayers());
+
+        $gameState->ensureStartable();
+    }
+
+    public function testItCannotStartUntilEveryoneIsReady(): void
+    {
+        $gameState = new GameState(5);
+        $gameState->addPlayer((new Player('ready'))->setStatus(PlayerStatus::READY));
+        $gameState->addPlayer(new Player('waiting'));
+
+        $this->expectExceptionObject(GameNotStartable::notEveryoneReady());
+
+        $gameState->ensureStartable();
     }
 
     public function testItDoesNotEndWhileTwoPlayersAreAlive(): void

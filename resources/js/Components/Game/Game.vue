@@ -42,6 +42,10 @@ const players = computed(() => activeGame.value?.players);
 const board = computed(() => activeGame.value?.tiles);
 const arenaSize = computed(() => activeGame.value?.arenaSize);
 const gameStatus = computed(() => activeGame.value?.status);
+// Matches the server's rule: at least two players, and everyone ready.
+const canStart = computed(() => gameStatus.value === 'waiting'
+    && players.value?.length >= 2
+    && players.value.every((player) => player.status === 'ready'));
 // Once the game is over, the last player still riding (if any) has won.
 const winner = computed(() => gameStatus.value === 'complete'
     ? players.value?.find((player) => player.status !== 'crashed') ?? null
@@ -190,7 +194,10 @@ onMounted(async () => {
       <PrimaryButton @click="startGame" v-if="activeGame.status === 'waiting'">Start Game</PrimaryButton>
       <PrimaryButton @click="markReady" v-if="activeGame.status === 'waiting'">Mark Ready</PrimaryButton>
     </template>
-    <PrimaryButton @click="stopWatching" v-if="activeGame && observing">Stop Watching</PrimaryButton>
+    <template v-if="activeGame && observing">
+      <PrimaryButton @click="startGame" v-if="canStart">Start Game</PrimaryButton>
+      <PrimaryButton @click="stopWatching">Stop Watching</PrimaryButton>
+    </template>
   </div>
 
   <div class="flex gap-8">
