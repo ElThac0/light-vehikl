@@ -98,6 +98,23 @@ const createAndWatchGame = async () => {
   }
 }
 
+// Briefly swap the copy icon for a tick once the id is on the clipboard.
+const copied = ref(false);
+let copiedTimer = null;
+
+const copyGameId = async () => {
+  try {
+    await navigator.clipboard.writeText(activeGame.value.id);
+  } catch (e) {
+    alert(`Couldn't copy the game id - ${errorMessage(e)}`);
+    return;
+  }
+
+  copied.value = true;
+  clearTimeout(copiedTimer);
+  copiedTimer = setTimeout(() => copied.value = false, 1500);
+}
+
 const addBot = async () => {
   const response = await axios.post(route('game.add-bot', { id: activeGame.value?.id }));
 
@@ -208,7 +225,18 @@ onMounted(async () => {
     </div>
     <div v-if="activeGame" class="w-2/3">
       <div class="flex justify-between items-center gap-2 mb-2">
-        <h2>{{ observing ? 'Watching Game' : 'In Game' }}: {{ activeGame?.id }}</h2>
+        <h2 class="flex items-center gap-1">
+          {{ observing ? 'Watching Game' : 'In Game' }}: {{ activeGame?.id }}
+          <button type="button" @click="copyGameId" :title="copied ? 'Copied!' : 'Copy game id'" :aria-label="copied ? 'Copied!' : 'Copy game id'" class="p-1 rounded hover:bg-gray-500/20">
+            <svg v-if="copied" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-green-500" aria-hidden="true">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+        </h2>
         <label class="flex items-center gap-2 text-sm">
           Render mode
           <select v-model="renderMode" class="border border-gray-300 rounded py-1 pl-2 pr-8 text-sm text-black">
