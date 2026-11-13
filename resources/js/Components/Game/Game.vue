@@ -188,8 +188,10 @@ onMounted(async () => {
   <div class="flex gap-1">
     <PrimaryButton @click="createGame" v-if="!activeGame && name" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Game</PrimaryButton>
     <PrimaryButton @click="createAndWatchGame" v-if="!activeGame && name">Create &amp; Watch</PrimaryButton>
-    <template v-if="activeGame && !observing">
+    <template v-if="activeGame">
       <PrimaryButton @click="addBot" v-if="activeGame.status === 'waiting'">Add Bot</PrimaryButton>
+    </template>
+    <template v-if="activeGame && !observing">
       <PrimaryButton @click="leaveGame">Leave Game</PrimaryButton>
       <PrimaryButton @click="startGame" v-if="activeGame.status === 'waiting'">Start Game</PrimaryButton>
       <PrimaryButton @click="markReady" v-if="activeGame.status === 'waiting'">Mark Ready</PrimaryButton>
